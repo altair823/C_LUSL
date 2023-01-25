@@ -19,5 +19,5 @@ add_subdirectory (test)
 
 
 enable_testing()
-add_test(NAME c_lusl_test COMMAND c_lusl_test)
+add_test(NAME sha_test COMMAND sha_test)
 add_test(NAME meta_test COMMAND meta_test)

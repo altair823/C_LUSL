@@ -8,8 +8,8 @@ ${PROJECT_SOURCE_DIR}/src/sha3.c
 ${PROJECT_SOURCE_DIR}/src/meta.c
 )
 
-add_executable(c_lusl_test sha_test.c ${SOURCES})
-target_include_directories(c_lusl_test PUBLIC ../include)
+add_executable(sha_test sha_test.c ${SOURCES})
+target_include_directories(sha_test PUBLIC ../include)
 
 
 add_executable(meta_test meta_test.c ${SOURCES})
