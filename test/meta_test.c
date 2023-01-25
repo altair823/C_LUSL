@@ -94,6 +94,61 @@ void fmeta_test() {
     remove(filename);
 }
 
+void serialize_test() {
+    char *filename = "test/meta_test4.bin";
+    FILE *file = fopen(filename, "wb");
+    assert(file != NULL);
+    for (int i = 0; i < 1000; i++) {
+        fprintf(file, "%d ", i);
+    }
+    fclose(file);
+    meta_t meta;
+    fmeta(filename, &meta);
+    BINARY_INIT(binary);
+    meta_serialize(&meta, &binary);
+    printf("%ld\n", binary.length);
+    for (int i = 0; i < binary.length; i++) {
+        for (int j = 0; j < 8; j++) {
+            printf("%d", (binary.data[i] >> (7 - j)) & 1);
+        }
+        printf(" ");
+    }
+    printf("\n");
+
+    // check if serialized data is correct
+    // Chech path
+    uint16_t path_size = 0;
+    path_size = binary.data[0] << 8;
+    path_size += binary.data[1];
+    assert(path_size == meta.path_length);
+    unsigned char *path = malloc(path_size);
+    memcpy(path, &binary.data[2], path_size);
+    assert(memcmp(path, meta.path, path_size) == 0);
+
+    // Check flags
+    uint8_t flags = binary.data[2 + path_size];
+    assert(flag_is_set(flags, IS_DIR) == meta.is_dir);
+    assert(flag_is_set(flags, IS_FILE) == meta.is_file);
+    assert(flag_is_set(flags, IS_LINK) == meta.is_link);
+
+    // Check size
+    uint8_t size_bytes = binary.data[2 + path_size] & 0xf;
+    uint64_t size = 0;
+    for (int i = 0; i < size_bytes; i++) {
+        size += binary.data[3 + path_size + i] << 8 * i;
+    }
+    assert(size == meta.size);
+
+    // Check hash
+    uint8_t hash[HASH_SIZE];
+    memcpy(hash, &binary.data[3 + path_size + size_bytes], HASH_SIZE);
+    assert(memcmp(hash, meta.hash, HASH_SIZE) == 0);
+    
+    // Free memory
+    BINARY_FREE(binary);
+    remove(filename);
+}
+
 int main () {
     #ifdef SHA3_256
     printf("SHA3_256\n");
@@ -104,6 +159,6 @@ int main () {
     fhash_test();
     fflags_test();
     fmeta_test();
-
+    serialize_test();
     return 0;
 }

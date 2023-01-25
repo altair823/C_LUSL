@@ -34,7 +34,7 @@
 
 typedef struct{
     unsigned char*path;
-    unsigned int path_length;
+    uint16_t path_length;
     uint8_t hash[HASH_SIZE];
     bool is_file;
     bool is_dir;
