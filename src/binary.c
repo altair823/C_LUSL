@@ -23,13 +23,7 @@ bool uint64_to_byte_arr(uint64_t num, binary_t *result) {
     uint8_t length = 8 - index;
     result->length = length;
     result->data = (uint8_t *) malloc(sizeof(uint8_t) * length);
-    for (int i = 0; i < 8; i++){
-        for (int j = 0; j < 8; j++){
-            printf("%d", (temp[i] >> (7 - j)) & 1);
-        }
-        printf(" ");
-    }
-    printf("\n");
+    
     // Save the meaningful numbers to result array in little-endian order.
     for (int i = 0; i < length; i++) {
         result->data[i] = temp[7 - i];

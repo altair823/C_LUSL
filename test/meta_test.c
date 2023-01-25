@@ -78,19 +78,20 @@ void fmeta_test() {
     for (int i = 0; i < 1000; i++) {
         fprintf(file, "%d ", i);
     }
-    fclose(file);
     meta_t meta;
     fmeta(filename, &meta);
-    printf("path: %s\n", meta.path);
-    printf("size: %ld\n", meta.size);
-    printf("is dir: %d\n", meta.is_dir);
-    printf("is file: %d\n", meta.is_file);
-    printf("is link: %d\n", meta.is_link);
-    printf("hash: ");
-    for (int i = 0; i < HASH_SIZE; i++) {
-        printf("%02x ", meta.hash[i]);
-    }
-    printf("\n");
+    assert(strcmp(meta.path, filename) == 0);
+    struct stat st;
+    fstat(fileno(file), &st);
+    assert(meta.size == st.st_size);
+    assert(meta.is_dir == false);
+    assert(meta.is_file == true);
+    assert(meta.is_link == false);
+    uint8_t hash[HASH_SIZE];
+    fhash(file, hash);
+    assert(memcmp(meta.hash, hash, HASH_SIZE) == 0);
+
+    fclose(file);
     remove(filename);
 }
 
@@ -106,15 +107,7 @@ void serialize_test() {
     fmeta(filename, &meta);
     BINARY_INIT(binary);
     meta_serialize(&meta, &binary);
-    printf("%ld\n", binary.length);
-    for (int i = 0; i < binary.length; i++) {
-        for (int j = 0; j < 8; j++) {
-            printf("%d", (binary.data[i] >> (7 - j)) & 1);
-        }
-        printf(" ");
-    }
-    printf("\n");
-
+    
     // check if serialized data is correct
     // Chech path
     uint16_t path_size = 0;
