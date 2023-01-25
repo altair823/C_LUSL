@@ -33,7 +33,7 @@
 #define IS_LINK 0x20
 
 typedef struct{
-    unsigned char*path;
+    unsigned char *path;
     uint16_t path_length;
     uint8_t hash[HASH_SIZE];
     bool is_file;
@@ -71,6 +71,10 @@ uint64_t fsize(FILE *file);
 */
 bool fmeta(char *filename, meta_t *meta);
 
-bool meta_serialize(meta_t *meta, binary_t *bin);
+bool serialize_meta(meta_t *meta, binary_t *bin);
+
+bool deserialize_meta(meta_t *meta, binary_t *bin);
+
+#define FREE_META(x) free(x.path); 
 
 #endif

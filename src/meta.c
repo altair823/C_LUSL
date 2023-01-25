@@ -65,7 +65,7 @@ bool fmeta(char *filename, meta_t *meta) {
     }
 }
 
-bool meta_serialize(meta_t *meta, binary_t *bin) {
+bool serialize_meta(meta_t *meta, binary_t *bin) {
     if (bin->data != NULL) {
         printf("Binary is already occupied.\n");
         return false; // Binary is already occupied.
@@ -80,7 +80,7 @@ bool meta_serialize(meta_t *meta, binary_t *bin) {
     path_length_bytes[1] = meta->path_length & 0xFF;
 
     BINARY_INIT(size_bytes);
-    uint64_to_byte_arr(meta->size, &size_bytes);
+    uint64_to_le_arr(meta->size, &size_bytes);
 
 
     bin->length = 2 // Path length binary size
@@ -115,5 +115,41 @@ bool meta_serialize(meta_t *meta, binary_t *bin) {
     memcpy(bin->data + 3 + meta->path_length + size_bytes.length, meta->hash, HASH_SIZE);
 
     BINARY_FREE(size_bytes);
+    return true;
+}
+
+bool deserialize_meta(meta_t *meta, binary_t *bin) {
+    if (bin->data == NULL) {
+        printf("Binary is empty.\n");
+        return false; // Binary is empty.
+    }
+
+    // Deserialize path length.
+    uint16_t path_length = (bin->data[0] << 8) | bin->data[1];
+
+    // Deserialize path.
+    meta->path = (char *) malloc(sizeof(char) * (path_length + 1));
+    memcpy(meta->path, bin->data + 2, path_length);
+    meta->path[path_length] = '\0';
+    meta->path_length = path_length;
+
+    // Deserialize flags.
+    uint8_t flags = bin->data[2 + path_length];
+    meta->is_file = flags & IS_FILE;
+    meta->is_dir = flags & IS_DIR;
+    meta->is_link = flags & IS_LINK;
+
+    // Deserialize file size.
+    uint8_t size_bytes_length = flags & 0x0F;
+    BINARY_INIT(size_bytes);
+    size_bytes.length = size_bytes_length;
+    size_bytes.data = (byte_t *) malloc(sizeof(byte_t) * size_bytes_length);
+    memcpy(size_bytes.data, bin->data + 3 + path_length, size_bytes_length);
+    meta->size = le_arr_to_uint64(&size_bytes);
+    BINARY_FREE(size_bytes);
+
+    // Deserialize hash.
+    memcpy(meta->hash, bin->data + 3 + path_length + size_bytes_length, HASH_SIZE);
+
     return true;
 }

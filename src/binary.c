@@ -1,6 +1,6 @@
 #include "binary.h"
 
-bool uint64_to_byte_arr(uint64_t num, binary_t *result) {
+bool uint64_to_le_arr(uint64_t num, binary_t *result) {
     if (result->data != NULL){
         return false;
     }
@@ -29,6 +29,14 @@ bool uint64_to_byte_arr(uint64_t num, binary_t *result) {
         result->data[i] = temp[7 - i];
     }
     return true;
+}
+
+uint64_t le_arr_to_uint64(binary_t *arr) {
+    uint64_t result = 0;
+    for (int i = 0; i < arr->length; i++) {
+        result |= (uint64_t) arr->data[i] << (i * 8);
+    }
+    return result;
 }
 
 bool flag_is_set(byte_t flag, byte_t flag_to_check) {

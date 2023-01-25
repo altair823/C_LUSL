@@ -6,7 +6,7 @@
 #include "meta.h"
 
 void fhash_test() {
-    char *filename = "test/meta_test1.bin";
+    char *filename = "test/fhash_test.bin";
     /* Using fhash function. */
     FILE *file = fopen(filename, "wb");
     assert(file != NULL);
@@ -48,7 +48,7 @@ void fhash_test() {
 }
 
 void fflags_test() {
-    char *filename = "test/meta_test2.bin";
+    char *filename = "test/fflags_test.bin";
     FILE *file = fopen(filename, "wb");
     assert(file != NULL);
     for (int i = 0; i < 1000; i++) {
@@ -72,7 +72,7 @@ void fflags_test() {
 }
 
 void fmeta_test() {
-    char *filename = "test/meta_test3.bin";
+    char *filename = "test/fmeta_test.bin";
     FILE *file = fopen(filename, "wb");
     assert(file != NULL);
     for (int i = 0; i < 1000; i++) {
@@ -93,10 +93,11 @@ void fmeta_test() {
 
     fclose(file);
     remove(filename);
+    FREE_META(meta);
 }
 
 void serialize_test() {
-    char *filename = "test/meta_test4.bin";
+    char *filename = "test/serialize_test.bin";
     FILE *file = fopen(filename, "wb");
     assert(file != NULL);
     for (int i = 0; i < 1000; i++) {
@@ -106,7 +107,7 @@ void serialize_test() {
     meta_t meta;
     fmeta(filename, &meta);
     BINARY_INIT(binary);
-    meta_serialize(&meta, &binary);
+    serialize_meta(&meta, &binary);
     
     // check if serialized data is correct
     // Chech path
@@ -140,6 +141,34 @@ void serialize_test() {
     // Free memory
     BINARY_FREE(binary);
     remove(filename);
+    FREE_META(meta);
+}
+
+void deserialize_test() {
+    char *filename = "test/deserialize_test.bin";
+    FILE *file = fopen(filename, "wb");
+    assert(file != NULL);
+    for (int i = 0; i < 1000; i++) {
+        fprintf(file, "%d ", i);
+    }
+    fclose(file);
+    meta_t meta;
+    fmeta(filename, &meta);
+    BINARY_INIT(binary);
+    serialize_meta(&meta, &binary);
+    meta_t meta2;
+    deserialize_meta(&meta2, &binary);
+    assert(strcmp(meta.path, meta2.path) == 0);
+    assert(meta.size == meta2.size);
+    assert(meta.is_dir == meta2.is_dir);
+    assert(meta.is_file == meta2.is_file);
+    assert(meta.is_link == meta2.is_link);
+    assert(memcmp(meta.hash, meta2.hash, HASH_SIZE) == 0);
+    BINARY_FREE(binary);
+    remove(filename);
+
+    FREE_META(meta);
+    FREE_META(meta2);
 }
 
 int main () {
@@ -153,5 +182,6 @@ int main () {
     fflags_test();
     fmeta_test();
     serialize_test();
+    deserialize_test();
     return 0;
 }

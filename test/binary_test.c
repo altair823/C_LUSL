@@ -2,9 +2,9 @@
 #include <binary.h>
 #include <assert.h>
 
-int main () {
+void uint64_to_le_arr_test() {
     BINARY_INIT(binary);
-    uint64_to_byte_arr(89213500000, &binary);
+    uint64_to_le_arr(89213500000, &binary);
     
     assert(binary.length == 5);
     assert(binary.data[0] == 0b01100000);
@@ -13,4 +13,18 @@ int main () {
     assert(binary.data[3] == 0b11000101);
     assert(binary.data[4] == 0b00010100);
     BINARY_FREE(binary);
+}
+
+void le_arr_to_uint64_test() {
+    BINARY_INIT(binary);
+    uint64_to_le_arr(89213500000, &binary);
+    uint64_t num = le_arr_to_uint64(&binary);
+    assert(num == 89213500000);
+    BINARY_FREE(binary);
+}
+
+int main () {
+    uint64_to_le_arr_test();
+    le_arr_to_uint64_test();
+    return 0;
 }
