@@ -23,8 +23,13 @@ void le_arr_to_uint64_test() {
     BINARY_FREE(binary);
 }
 
+void assert_fail_test() {
+    assert(false);
+}
+
 int main () {
     uint64_to_le_arr_test();
     le_arr_to_uint64_test();
+    assert_fail_test();
     return 0;
 }
