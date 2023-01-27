@@ -14,12 +14,12 @@ typedef uint8_t byte_t;
  * The data is stored in a byte array.
 */
 typedef struct {
-    byte_t *data; /**< Data of binary. */
-    size_t length; /**< Length of data. */
+    byte_t *data; ///< Data of binary.
+    size_t length; ///< Length of data.
 } binary_t;
 
-#define BINARY_INIT(x) binary_t x = { NULL, 0 } /**< Initialize binary. */
-#define BINARY_FREE(x) if (x.data) { free(x.data); x.data = NULL; x.length = 0; } else { x.length = 0; } /**< Free binary. */
+#define BINARY_INIT(x) binary_t x = { NULL, 0 } ///< Initialize binary.
+#define BINARY_FREE(x) if (x.data) { free(x.data); x.data = NULL; x.length = 0; } else { x.length = 0; } ///< Free binary.
 
 /**
  * @brief Convert uint64_t to little endian array.

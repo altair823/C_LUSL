@@ -17,3 +17,6 @@ target_include_directories(meta_test PUBLIC ../include)
 
 add_executable(binary_test binary_test.c ${SOURCES})
 target_include_directories(binary_test PUBLIC ../include)
+
+add_executable(header_test header_test.c ${SOURCES})
+target_include_directories(header_test PUBLIC ../include)

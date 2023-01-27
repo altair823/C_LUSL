@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "config.h"
+
 /// File header label.
 #define FILE_LABEL LUSL Serialized File
 /// Offset for version in file header.
@@ -21,17 +23,25 @@ typedef struct {
     unsigned char major;
     unsigned char minor;
     unsigned char patch;
-} Version;
+} version_t;
+
+///< Create version struct from current major, minor, and patch versions of program.
+#define CURRENT_VERSION(version) version_t version = {MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION}
+
+///< Create empty version struct.
+#define EMPTY_VERSION(version) version_t version = {0, 0, 0}
 
 /**
- * @brief The FileHeader struct
+ * @brief The file header struct
 */
 typedef struct {
-    Version version; ///< Version of file.
+    version_t version; ///< Version of file.
     bool is_encrypted; ///< Flag whether file is encrypted.
     bool is_compressed; ///< Flag whether file is compressed.
     uint64_t file_count; ///< Number of files in file.
-} FileHeader;
+} file_header_t;
 
+///< Create file header struct with current version of program.
+#define INIT_FILE_HEADER(header) file_header_t header = {{MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION}, false, false, 0}
 
 #endif
