@@ -12,40 +12,45 @@
 #include "binary.h"
 
 #define BUFFER_SIZE 1024
-#define SHA3_256
-// #define SHA3_512
+#define SHA3_256 ///< SHA-3 256-bit hash.
+// #define SHA3_512 ///< SHA-3 512-bit hash.
 
-#define NULL_HASH '0'
+#define NULL_HASH '0' ///< Null hash value.
 
 #ifdef SHA3_256
-#define HASH_SIZE 32
-#define INIT_SHA3(x) sha3_Init256(x)
+#define HASH_SIZE 32 ///< Size of hash.
+#define INIT_SHA3(x) sha3_Init256(x) ///< Initialize SHA-3.
 #endif
 #ifdef SHA3_512
-#define HASH_SIZE 64
-#define INIT_SHA3(x) sha3_Init512(x)
+#define HASH_SIZE 64 ///< Size of hash.
+#define INIT_SHA3(x) sha3_Init512(x) ///< Initialize SHA-3.
 #endif
 
-#define FILL_NULL_HASH(x) for (int i = 0; i < HASH_SIZE; i++) { x[i] = NULL_HASH; }
+#define FILL_NULL_HASH(x) for (int i = 0; i < HASH_SIZE; i++) { x[i] = NULL_HASH; } ///< Fill hash with null hash value.
 
 #define IS_DIR 0x80
 #define IS_FILE 0x40
 #define IS_LINK 0x20
 
+/**
+ * @brief The metadata struct
+ * @details The metadata struct is used to store the metadata of a file.
+*/
 typedef struct{
-    unsigned char *path;
-    uint16_t path_length;
-    uint8_t hash[HASH_SIZE];
-    bool is_file;
-    bool is_dir;
-    bool is_link;
-    uint64_t size;
+    unsigned char *path; /**< Path of file. */
+    uint16_t path_length; /**< Length of path. */
+    uint8_t hash[HASH_SIZE]; /**< Hash of file. */
+    bool is_file; /**< Flag whether target is file. */
+    bool is_dir; /**< Flag whether target is directory. */
+    bool is_link; /**< Flag whether target is link. */
+    uint64_t size; /**< Size of file. */
 } meta_t;
 
 /**
  * @brief Get the hash of a file.
+ * @details Hash is calculated using SHA-3.
  * @param file File to get hash of.
- * @return Hash of file. Must be freed.
+ * @param hash Hash of file.
 */
 void fhash(FILE *file, uint8_t *hash);
 
@@ -67,14 +72,27 @@ uint64_t fsize(FILE *file);
 /**
  * @brief Get the metadata of a file.
  * @param filename File to get metadata of.
- * @return Metadata of file.
+ * @param meta Metadata of file.
+ * @return True if successful, false otherwise.
 */
 bool fmeta(char *filename, meta_t *meta);
 
+/**
+ * @brief Serialize metadata.
+ * @param meta Metadata to serialize.
+ * @param bin Binary to serialize metadata to.
+ * @return True if successful, false otherwise.
+*/
 bool serialize_meta(meta_t *meta, binary_t *bin);
 
+/**
+ * @brief Deserialize metadata.
+ * @param meta Metadata to deserialize to.
+ * @param bin Binary to deserialize from.
+ * @return True if successful, false otherwise.
+*/
 bool deserialize_meta(meta_t *meta, binary_t *bin);
 
-#define FREE_META(x) free(x.path); 
+#define FREE_META(x) free(x.path); ///< Free metadata.
 
 #endif
