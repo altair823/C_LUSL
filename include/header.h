@@ -32,6 +32,13 @@ typedef struct {
 #define EMPTY_VERSION(version) version_t version = {0, 0, 0}
 
 /**
+ * @brief Convert version struct to byte.
+ * @param version Version struct to convert.
+ * @return Byte representation of version struct.
+*/
+uint8_t version_to_byte(version_t version);
+
+/**
  * @brief The file header struct
 */
 typedef struct {
