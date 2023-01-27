@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #include "config.h"
+#include "binary.h"
 
 /// File header label.
 #define FILE_LABEL LUSL Serialized File
@@ -34,9 +35,9 @@ typedef struct {
 /**
  * @brief Convert version struct to byte.
  * @param version Version struct to convert.
- * @return Byte representation of version struct.
+ * @param byte Byte to store result in.
 */
-uint8_t version_to_byte(version_t version);
+void version_to_byte(version_t version, binary_t *byte);
 
 /**
  * @brief The file header struct

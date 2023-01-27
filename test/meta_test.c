@@ -3,9 +3,11 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "test_util.h"
 #include "meta.h"
 
 void fhash_test() {
+    INIT_TEST_SUITE;
     char *filename = "test/fhash_test.bin";
     /* Using fhash function. */
     FILE *file = fopen(filename, "wb");
@@ -18,10 +20,6 @@ void fhash_test() {
     assert(file2 != NULL);
     uint8_t hash[HASH_SIZE];
     fhash(file2, hash);
-    for (int i = 0; i < HASH_SIZE; i++) {
-        printf("%02x ", hash[i]);
-    }
-    printf("\n");
     fclose(file2);
 
     /* Compare actual hash of file. */
@@ -35,19 +33,15 @@ void fhash_test() {
         sha3_Update(&ctx, data, n);
     }
     const uint8_t *hash2 = sha3_Finalize(&ctx);
-
-    for (int i = 0; i < HASH_SIZE; i++) {
-        printf("%02x ", hash2[i]);
-    }
-
-    printf("\n");
     fclose(file3);
 
     assert(memcmp(hash, hash2, 32) == 0);
     remove(filename);
+    END_TEST_SUITE;
 }
 
 void fflags_test() {
+    INIT_TEST_SUITE;
     char *filename = "test/fflags_test.bin";
     FILE *file = fopen(filename, "wb");
     assert(file != NULL);
@@ -58,20 +52,16 @@ void fflags_test() {
     FILE *file2 = fopen(filename, "rb");
     assert(file2 != NULL);
     uint8_t flags = fflags(file2);
-    // print all bits
-    printf("flags: ");
-    for (int i = 7; i >= 0; i--) {
-        printf("%d", (flags >> i) & 1);
-    }
-    printf("\n");
 
     // check if flags are correct
     assert(flags & IS_FILE);
     fclose(file2);
     remove(filename);
+    END_TEST_SUITE;
 }
 
 void fmeta_test() {
+    INIT_TEST_SUITE;
     char *filename = "test/fmeta_test.bin";
     FILE *file = fopen(filename, "wb");
     assert(file != NULL);
@@ -94,9 +84,11 @@ void fmeta_test() {
     fclose(file);
     remove(filename);
     FREE_META(meta);
+    END_TEST_SUITE;
 }
 
 void serialize_test() {
+    INIT_TEST_SUITE;
     char *filename = "test/serialize_test.bin";
     FILE *file = fopen(filename, "wb");
     assert(file != NULL);
@@ -142,9 +134,11 @@ void serialize_test() {
     BINARY_FREE(binary);
     remove(filename);
     FREE_META(meta);
+    END_TEST_SUITE;
 }
 
 void deserialize_test() {
+    INIT_TEST_SUITE;
     char *filename = "test/deserialize_test.bin";
     FILE *file = fopen(filename, "wb");
     assert(file != NULL);
@@ -169,15 +163,10 @@ void deserialize_test() {
 
     FREE_META(meta);
     FREE_META(meta2);
+    END_TEST_SUITE;
 }
 
 int main () {
-    #ifdef SHA3_256
-    printf("SHA3_256\n");
-    #endif
-    #ifdef SHA3_512
-    printf("SHA3_512\n");
-    #endif
     fhash_test();
     fflags_test();
     fmeta_test();

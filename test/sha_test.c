@@ -1,10 +1,13 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+
+#include "test_util.h"
 #include "sha3.h"
 #include "meta.h"
 
 void string_hash_test() {
+    INIT_TEST_SUITE;
 
     int size = 32;
 
@@ -13,31 +16,17 @@ void string_hash_test() {
     sha3_Update(&c, "abc", 3);
     const uint8_t *hash = sha3_Finalize(&c);
 
-    for (int i = 0; i < size; i++) {
-        if (i > 0) {
-            printf("%02x ", hash[i]);
-        }
-    }
-    printf("\n");
-
     sha3_context c2;
     sha3_Init256(&c2);
     sha3_Update(&c2, "abc", 3);
     const uint8_t *hash2 = sha3_Finalize(&c2);
 
-    for (int i = 0; i < size; i++) {
-        if (i > 0) {
-            printf("%02x ", hash2[i]);
-        }
-    }
-
-    for (int i = 0; i < size; i++){
-        assert(hash[i] == hash2[i]);
-    }
-    printf("\n");
+    assert(memcmp(hash, hash2, size) == 0);
+    END_TEST_SUITE;
 }
 
 void file_hash_test() {
+    INIT_TEST_SUITE;
     FILE *file = fopen("test/test.bin", "wb");
     assert(file != NULL);
     for (int i = 0; i < 1000; i++) {
@@ -56,12 +45,6 @@ void file_hash_test() {
         sha3_Update(&ctx, data, n);
     }
     const uint8_t *hash = sha3_Finalize(&ctx);
-
-    for (int i = 0; i < HASH_SIZE; i++) {
-        printf("%02x ", hash[i]);
-    }
-
-    printf("\n");
     fclose(file2);
 
     FILE *file3 = fopen("test/test.bin", "rb");
@@ -74,17 +57,12 @@ void file_hash_test() {
         sha3_Update(&ctx2, data2, n2);
     }
     const uint8_t *hash2 = sha3_Finalize(&ctx2);
-
-    for (int i = 0; i < HASH_SIZE; i++) {
-        printf("%02x ", hash2[i]);
-    }
-
-    printf("\n");
     fclose(file3);
 
     assert(memcmp(hash, hash2, HASH_SIZE) == 0);
 
     remove("test/test.bin");
+    END_TEST_SUITE;
 }
 
 int main() {
