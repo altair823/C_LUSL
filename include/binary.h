@@ -28,7 +28,7 @@ typedef struct _binary_t {
 #define INIT_BINARY(x) binary_t x = { NULL, 0 , false, false, NULL, 0, 0} ///< Initialize binary.
 #define FREE_BINARY(x) if (x.data && x.is_ref == false && x.is_ref_exist == false) \
     { free(x.data); x.data = NULL; x.length = 0; } \
-else if (x.data && x.is_ref == true) { assert(false && "Cannot free reference"); } \
+else if (x.data && x.is_ref == true) { } \
 else if (x.data && x.is_ref == false && x.is_ref_exist == true) \
     { for (size_t i = 0; i < x.ref_count; i++) \
         { x.ref_list[i]->data = NULL; x.ref_list[i]->length = 0; } \
