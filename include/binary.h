@@ -5,6 +5,10 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
+#include <assert.h>
+
+#define assert_m(exp, msg) assert(exp && msg)
 
 typedef uint8_t byte_t;
 
@@ -18,8 +22,29 @@ typedef struct {
     size_t length; ///< Length of data.
 } binary_t;
 
-#define BINARY_INIT(x) binary_t x = { NULL, 0 } ///< Initialize binary.
-#define BINARY_FREE(x) if (x.data) { free(x.data); x.data = NULL; x.length = 0; } else { x.length = 0; } ///< Free binary.
+#define INIT_BINARY(x) binary_t x = { NULL, 0 } ///< Initialize binary.
+#define FREE_BINARY(x) if (x.data) { free(x.data); x.data = NULL; x.length = 0; } else { x.length = 0; } ///< Free binary.
+#define CHECK_BINARY_PTR_NOT_NULL(x) if (!x->data) { assert_m(false, "Data in binary_t is NULL"); } ///< Check if binary pointer is null. 
+#define CHECK_BINARY_PTR_NULL(x) if (x->data) { assert_m(false, "Data in binary_t is not NULL"); } ///< Check if binary pointer is not null.
+
+/**
+ * @brief Concatenate two binary_t values.
+ * @param dest Destination binary_t value.
+ * @param to_concat binary_t value to concatenate.
+ * @return True if successful, false otherwise.
+ * @details The binary data of to_concat value will be freed, 
+ * and data of it will be concatenated to the end of dest.
+*/
+bool concat_binary(binary_t *dest, binary_t *to_concat);
+
+/**
+ * @brief Append data of array to binary_t value.
+ * @param dest Destination binary_t value.
+ * @param to_append Byte array to append.
+ * @param length Length of array.
+ * @return True if successful, false otherwise.
+*/
+bool append_binary(binary_t *dest, byte_t *to_append, size_t length);
 
 /**
  * @brief Convert uint64_t to little endian array.

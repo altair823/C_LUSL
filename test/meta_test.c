@@ -98,7 +98,7 @@ void serialize_test() {
     fclose(file);
     meta_t meta;
     fmeta(filename, &meta);
-    BINARY_INIT(binary);
+    INIT_BINARY(binary);
     serialize_meta(&meta, &binary);
     
     // check if serialized data is correct
@@ -131,7 +131,7 @@ void serialize_test() {
     assert(memcmp(hash, meta.hash, HASH_SIZE) == 0);
     
     // Free memory
-    BINARY_FREE(binary);
+    FREE_BINARY(binary);
     remove(filename);
     FREE_META(meta);
     END_TEST_SUITE;
@@ -148,7 +148,7 @@ void deserialize_test() {
     fclose(file);
     meta_t meta;
     fmeta(filename, &meta);
-    BINARY_INIT(binary);
+    INIT_BINARY(binary);
     serialize_meta(&meta, &binary);
     meta_t meta2;
     deserialize_meta(&meta2, &binary);
@@ -158,7 +158,7 @@ void deserialize_test() {
     assert(meta.is_file == meta2.is_file);
     assert(meta.is_link == meta2.is_link);
     assert(memcmp(meta.hash, meta2.hash, HASH_SIZE) == 0);
-    BINARY_FREE(binary);
+    FREE_BINARY(binary);
     remove(filename);
 
     FREE_META(meta);

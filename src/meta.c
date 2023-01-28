@@ -66,10 +66,8 @@ bool fmeta(char *filename, meta_t *meta) {
 }
 
 bool serialize_meta(meta_t *meta, binary_t *bin) {
-    if (bin->data != NULL) {
-        printf("Binary is already occupied.\n");
-        return false; // Binary is already occupied.
-    } else if (meta->path_length > 0xFFFF) {
+    CHECK_BINARY_PTR_NULL(bin)
+    else if (meta->path_length > 0xFFFF) {
         printf("Path is too long. (>65535)\n");
         return false; // Path is too long.
     }
@@ -79,7 +77,7 @@ bool serialize_meta(meta_t *meta, binary_t *bin) {
     path_length_bytes[0] = (meta->path_length >> 8) & 0xFF;
     path_length_bytes[1] = meta->path_length & 0xFF;
 
-    BINARY_INIT(size_bytes);
+    INIT_BINARY(size_bytes);
     uint64_to_le_arr(meta->size, &size_bytes);
 
 
@@ -114,7 +112,7 @@ bool serialize_meta(meta_t *meta, binary_t *bin) {
     // Serialize hash.
     memcpy(bin->data + 3 + meta->path_length + size_bytes.length, meta->hash, HASH_SIZE);
 
-    BINARY_FREE(size_bytes);
+    FREE_BINARY(size_bytes);
     return true;
 }
 
@@ -141,12 +139,12 @@ bool deserialize_meta(meta_t *meta, binary_t *bin) {
 
     // Deserialize file size.
     uint8_t size_bytes_length = flags & 0x0F;
-    BINARY_INIT(size_bytes);
+    INIT_BINARY(size_bytes);
     size_bytes.length = size_bytes_length;
     size_bytes.data = (byte_t *) malloc(sizeof(byte_t) * size_bytes_length);
     memcpy(size_bytes.data, bin->data + 3 + path_length, size_bytes_length);
     meta->size = le_arr_to_uint64(&size_bytes);
-    BINARY_FREE(size_bytes);
+    FREE_BINARY(size_bytes);
 
     // Deserialize hash.
     memcpy(meta->hash, bin->data + 3 + path_length + size_bytes_length, HASH_SIZE);
