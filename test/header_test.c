@@ -58,6 +58,7 @@ void serialize_version_test() {
     assert(binary.data[0] == version.major);
     assert(binary.data[1] == version.minor);
     assert(binary.data[2] == version.patch);
+    FREE_BINARY(binary);
     END_TEST_SUITE;
 }
 
@@ -69,6 +70,7 @@ void serialize_flags_test() {
     INIT_BINARY(binary);
     serialize_flags(header, &binary);
     assert(binary.data[0] == ENCRYPTED_FLAG | COMPRESSED_FLAG);
+    FREE_BINARY(binary);
     END_TEST_SUITE;
 }
 
@@ -89,6 +91,7 @@ void serialize_file_count_test() {
     assert(binary.data[6] == 0x56);
     assert(binary.data[7] == 0x34);
     assert(binary.data[8] == 0x12);
+    FREE_BINARY(binary);
     END_TEST_SUITE;
 }
 
@@ -125,6 +128,27 @@ void serialize_file_header_test() {
     assert(binary.data[i++] == 0x56);
     assert(binary.data[i++] == 0x34);
     assert(binary.data[i++] == 0x12);
+    FREE_BINARY(binary);
+    END_TEST_SUITE;
+}
+
+void deserialize_file_header_test() {
+    INIT_TEST_SUITE;
+    INIT_FILE_HEADER(header);
+    header.is_encrypted = true;
+    header.is_compressed = true;
+    header.file_count = 0x123456789ABCDEF0;
+    INIT_BINARY(binary);
+    serialize_file_header(header, &binary);
+    INIT_FILE_HEADER(deserialized_header);
+    deserialize_file_header(&binary, &deserialized_header);
+    assert(deserialized_header.version.major == header.version.major);
+    assert(deserialized_header.version.minor == header.version.minor);
+    assert(deserialized_header.version.patch == header.version.patch);
+    assert(deserialized_header.is_encrypted == header.is_encrypted);
+    assert(deserialized_header.is_compressed == header.is_compressed);
+    assert(deserialized_header.file_count == header.file_count);
+    FREE_BINARY(binary);
     END_TEST_SUITE;
 }
 
@@ -136,5 +160,6 @@ int main () {
     serialize_flags_test();
     serialize_file_count_test();
     serialize_file_header_test();
+    deserialize_file_header_test();
     return 0;
 }

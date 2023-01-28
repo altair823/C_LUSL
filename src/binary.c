@@ -48,6 +48,33 @@ bool append_binary(binary_t *dest, byte_t *to_append, size_t length) {
     }
 }
 
+bool create_binary_ref(binary_t *src, binary_t *ref, size_t offset, size_t length) {
+    CHECK_BINARY_PTR_NOT_NULL(src);
+    CHECK_BINARY_PTR_NULL(ref);
+    if (src->is_ref) {
+        assert(false && "Cannot create reference from a reference.");
+    }
+
+    if (offset + length > src->length){
+        return false;
+    }
+    ref->data = src->data + offset;
+    ref->length = length;
+    ref->is_ref = true;
+    src->is_ref_exist = true;
+    if (src->ref_list == NULL){
+        src->ref_list = (binary_t **) malloc(sizeof(binary_t *));
+        src->ref_size = 1;
+    } else if (src->ref_size == src->ref_count) {
+        src->ref_list = (binary_t **) realloc(src->ref_list, sizeof(binary_t *) * (src->ref_size * 2));
+        src->ref_size++;
+    }
+    src->ref_list[src->ref_count] = ref;
+    src->ref_count++;
+
+    return true;
+}
+
 bool uint64_to_le_arr(uint64_t num, binary_t *result) {
     if (result->data != NULL){
         return false;

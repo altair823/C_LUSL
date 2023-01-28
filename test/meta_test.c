@@ -102,7 +102,7 @@ void serialize_test() {
     serialize_meta(&meta, &binary);
     
     // check if serialized data is correct
-    // Chech path
+    // Check path
     uint16_t path_size = 0;
     path_size = binary.data[0] << 8;
     path_size += binary.data[1];

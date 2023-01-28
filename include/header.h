@@ -41,6 +41,18 @@ typedef struct {
 ///< Create empty version struct.
 #define EMPTY_VERSION(version) version_t version = {0, 0, 0}
 
+enum v_cmp_result {
+    VERSION_COMPATIBLE = 1, ///< The version of the file is compatible but maybe older than the current version of the program.
+    VERSION_INCOMPATIBLE = 0 ///< The version of the file is not compatible.
+};
+
+/**
+ * @brief Compare two version structs.
+ * @param file_version Version of file.
+ * @return Version compatibility.
+*/
+enum v_cmp_result compare_version(version_t file_version);
+
 /**
  * @brief Convert version struct to byte.
  * @param version Version struct to convert.
@@ -87,5 +99,13 @@ bool serialize_flags(file_header_t header, binary_t *binary);
  * the remaining bytes are the file count.
 */
 bool serialize_file_count(file_header_t header, binary_t *binary);
+
+/**
+ * @brief Deserialize file header from byte array.
+ * @param binary Byte array to deserialize from.
+ * @param new_header File header to store result in.
+ * @return True if successful, false otherwise.
+*/
+bool deserialize_file_header(binary_t *binary, file_header_t *new_header);
 
 #endif
