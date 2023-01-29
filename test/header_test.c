@@ -69,7 +69,7 @@ void serialize_flags_test() {
     header.is_compressed = true;
     INIT_BINARY(binary);
     serialize_flags(header, &binary);
-    assert(binary.data[0] == ENCRYPTED_FLAG | COMPRESSED_FLAG);
+    assert(binary.data[0] == (ENCRYPTED_FLAG | COMPRESSED_FLAG));
     FREE_BINARY(binary);
     END_TEST_SUITE;
 }

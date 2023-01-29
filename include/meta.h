@@ -37,7 +37,7 @@
  * @details The metadata struct is used to store the metadata of a file.
 */
 typedef struct{
-    unsigned char *path; ///< Path of file.
+    char *path; ///< Path of file.
     uint16_t path_length; ///< Length of path.
     uint8_t hash[HASH_SIZE]; ///< Hash of file.
     bool is_file; ///< Flag whether target is file.

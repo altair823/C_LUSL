@@ -71,18 +71,49 @@ void create_binary_ref_test() {
         assert(binary.data[i] == i);
     }
 
-    INIT_BINARY(ref);
-    create_binary_ref(&binary, &ref, 5, 5);
-    assert(ref.length == 5);
-    for (int i = 0; i < ref.length; i++) {
-        assert(ref.data[i] == i + 5);
+    INIT_BINARY(ref1);
+    create_binary_ref(&binary, &ref1, 5, 5);
+    assert(ref1.length == 5);
+    for (int i = 0; i < ref1.length; i++) {
+        assert(ref1.data[i] == i + 5);
     }
-    FREE_BINARY(ref);
-    assert(ref.data != NULL);
+    assert(ref1.is_ref == true);
+    assert(binary.is_ref_exist == true);
+    assert(binary.ref_size == 1);
+    assert(binary.ref_list != NULL);
+    assert(binary.ref_list[0] == &ref1);
+
+    INIT_BINARY(ref2);
+    create_binary_ref(&binary, &ref2, 0, 5);
+    assert(ref2.length == 5);
+    for (int i = 0; i < ref2.length; i++) {
+        assert(ref2.data[i] == i);
+    }
+    assert(ref2.is_ref == true);
+    assert(binary.is_ref_exist == true);
+    assert(binary.ref_size == 2);
+    assert(binary.ref_list != NULL);
+    assert(binary.ref_list[0] == &ref1);
+    assert(binary.ref_list[1] == &ref2);
+
+    FREE_BINARY(ref1);
+    assert(ref1.data != NULL);
     assert(binary.data != NULL);
+    assert(binary.is_ref_exist == true);
+    assert(binary.ref_size == 2);
+    assert(binary.ref_list != NULL);
+    assert(binary.ref_list[0] == &ref1);
+    assert(binary.ref_list[1] == &ref2);
+
     FREE_BINARY(binary);
-    assert(ref.data == NULL);
+    assert(ref1.data == NULL);
+    assert(ref1.is_ref == false);
+    assert(ref2.data == NULL);
+    assert(ref2.is_ref == false);
     assert(binary.data == NULL);
+    assert(binary.is_ref_exist == false);
+    assert(binary.ref_size == 0);
+    assert(binary.ref_list == NULL);
     END_TEST_SUITE;
 }
 

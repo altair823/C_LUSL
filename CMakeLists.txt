@@ -15,6 +15,7 @@ ${PROJECT_SOURCE_DIR}/src/header.c
 # main executable
 add_executable(c_lusl main.c ${SOURCES})
 target_include_directories(c_lusl PRIVATE include)
+target_compile_options(c_lusl PUBLIC -Wall -Werror)
 
 # test executable
 add_subdirectory (test)

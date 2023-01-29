@@ -53,9 +53,17 @@ bool create_binary_ref(binary_t *src, binary_t *ref, size_t offset, size_t lengt
     CHECK_BINARY_PTR_NULL(ref);
     if (src->is_ref) {
         assert(false && "Cannot create reference from a reference.");
+        ref->data = NULL;
+        ref->length = 0;
+        ref->is_ref = false;
+        return false;
     }
 
     if (offset + length > src->length){
+        assert(false && "Offset and length out of range.");
+        ref->data = NULL;
+        ref->length = 0;
+        ref->is_ref = false;
         return false;
     }
     ref->data = src->data + offset;

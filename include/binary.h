@@ -31,8 +31,8 @@ typedef struct _binary_t {
 else if (x.data && x.is_ref == true) { } \
 else if (x.data && x.is_ref == false && x.is_ref_exist == true) \
     { for (size_t i = 0; i < x.ref_count; i++) \
-        { x.ref_list[i]->data = NULL; x.ref_list[i]->length = 0; } \
-    free(x.ref_list); x.ref_list = NULL; x.ref_count = 0; x.ref_size = 0; \
+        { x.ref_list[i]->data = NULL; x.ref_list[i]->length = 0; x.ref_list[i]->is_ref = false; } \
+    free(x.ref_list); x.ref_list = NULL; x.ref_count = 0; x.ref_size = 0; x.is_ref_exist = false; \
     free(x.data); x.data = NULL; x.length = 0; \
     } \
 else { x.length = 0; } ///< Free binary_t.
