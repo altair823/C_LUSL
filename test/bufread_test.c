@@ -12,7 +12,7 @@ void chunk_test() {
         fprintf(file, "%d", i);
     }
     fclose(file);
-    
+
     INIT_CHUNK(chunk1);
     file = fopen("bufread_test.txt", "r");
     assert(file != NULL);
@@ -22,7 +22,6 @@ void chunk_test() {
     for (int i = 0; i < chunk1.length; i++) {
         assert(chunk1.data[i] == i + '0');
     }
-    printf("\n");
     FREE_CHUNK(chunk1);
 
     INIT_CHUNK(chunk2);
@@ -43,7 +42,6 @@ void chunk_test() {
 
     assert(chunk2.data[8] == '1');
     assert(chunk2.data[9] == '4');
-    printf("\n");
     FREE_CHUNK(chunk2);
     fclose(file);
 
@@ -53,10 +51,6 @@ void chunk_test() {
     assert(read_chunk(file, &big_chunk));
     printf("chunk2.length = %d\n", big_chunk.length);
     assert(big_chunk.length == 90);
-    for (int i = 0; i < big_chunk.length; i++) {
-        printf("%c", big_chunk.data[i]);
-    }
-    printf("\n");
     FREE_CHUNK(big_chunk);
     fclose(file);
 
