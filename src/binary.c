@@ -48,6 +48,18 @@ bool append_binary(binary_t *dest, byte_t *to_append, size_t length) {
     }
 }
 
+bool copy_binary(binary_t *src, binary_t *dest) {
+    CHECK_BINARY_PTR_NOT_NULL(src);
+    CHECK_BINARY_PTR_NULL(dest);
+    dest->data = (uint8_t *) malloc(sizeof(uint8_t) * src->length);
+    if (dest->data == NULL){
+        return false;
+    }
+    dest->length = src->length;
+    memcpy(dest->data, src->data, src->length);
+    return true;
+}
+
 bool create_binary_ref(binary_t *src, binary_t *ref, size_t offset, size_t length) {
     CHECK_BINARY_PTR_NOT_NULL(src);
     CHECK_BINARY_PTR_NULL(ref);

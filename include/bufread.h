@@ -4,6 +4,8 @@
 #include <assert.h>
 #include <string.h>
 
+#include "binary.h"
+
 /**
  * @brief The chunk struct using for reading file in chunks. 
  */
@@ -26,4 +28,15 @@ typedef struct _chunk_t {
  * @param chunk_size Size of chunk.
  * @return True if successful, false otherwise.
  */
-bool read_chunk(FILE *file, chunk_t *chunk);
+bool read_chunk(FILE *file, chunk_t *chunk, size_t chunk_size);
+
+typedef struct _bufreader_t {
+    FILE *file;
+    chunk_t chunk;
+    size_t chunk_size;
+    size_t current_offset;
+} bufreader_t;
+
+#define INIT_BUFREADER(x, file, buf_size) bufreader_t x = { file, { NULL, buf_size }, buf_size, 0 } ///< Initialize bufreader.
+
+bool read_bufreader(bufreader_t *bufreader, size_t length, binary_t *binary);

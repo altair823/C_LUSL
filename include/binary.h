@@ -61,6 +61,14 @@ bool concat_binary(binary_t *dest, binary_t *to_concat);
 bool append_binary(binary_t *dest, byte_t *to_append, size_t length);
 
 /**
+ * @brief Copy binary_t value.
+ * @param src Source binary_t value.
+ * @param dest Destination binary_t value.
+ * @return True if successful, false otherwise.
+*/
+bool copy_binary(binary_t *src, binary_t *dest);
+
+/**
  * @brief Create a new reference to a binary_t value.
  * @param src Source binary_t value.
  * @param ref Reference to create.
