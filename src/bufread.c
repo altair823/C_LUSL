@@ -23,7 +23,7 @@ bool read_chunk(FILE *file, chunk_t *chunk, size_t chunk_size) {
         return true;
     }
 }
-bool read_bufreader(bufreader_t *bufreader, size_t length, binary_t *binary) {
+bool read_bufreader(bufreader_t *bufreader, binary_t *binary, size_t length) {
     CHECK_BINARY_PTR_NULL(binary);
     if (!bufreader) {
         assert(false && "bufreader is NULL");

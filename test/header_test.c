@@ -20,7 +20,7 @@ void file_header_test() {
 void serialize_file_label_test() {
     INIT_TEST_SUITE;
     INIT_BINARY(binary);
-    serialize_file_label(&binary);
+    ser_flabel(&binary);
     assert(binary.length == sizeof(FILE_LABEL) - 1); // -1 to exclude null terminator
     for (int i = 0; i < binary.length; i++) {
         assert(binary.data[i] == FILE_LABEL[i]);
@@ -53,7 +53,7 @@ void serialize_version_test() {
     INIT_TEST_SUITE;
     CURRENT_VERSION(version);
     binary_t binary;
-    serialize_version(version, &binary);
+    ser_version(version, &binary);
     assert(binary.length == 3);
     assert(binary.data[0] == version.major);
     assert(binary.data[1] == version.minor);
@@ -68,7 +68,7 @@ void serialize_flags_test() {
     header.is_encrypted = true;
     header.is_compressed = true;
     INIT_BINARY(binary);
-    serialize_flags(header, &binary);
+    ser_fflags(header, &binary);
     assert(binary.data[0] == (ENCRYPTED_FLAG | COMPRESSED_FLAG));
     FREE_BINARY(binary);
     END_TEST_SUITE;
@@ -79,7 +79,7 @@ void serialize_file_count_test() {
     INIT_FILE_HEADER(header);
     header.file_count = 0x123456789ABCDEF0;
     INIT_BINARY(binary);
-    serialize_file_count(header, &binary);
+    ser_fcount(header, &binary);
     assert(binary.length == 9);
     assert(binary.data[0] == 8); // 8 bytes
     // little endian encoding of 0x123456789ABCDEF0
@@ -102,7 +102,7 @@ void serialize_file_header_test() {
     header.is_compressed = true; // Flags are 1 byte.
     header.file_count = 0x123456789ABCDEF0; // 9 bytes after serialized.
     INIT_BINARY(binary);
-    serialize_file_header(header, &binary);
+    ser_fheader(header, &binary);
     // -1 to exclude null terminator in FILE_LABEL 
     // and 4 bytes for version.
     assert(binary.length == sizeof(FILE_LABEL) - 1 + 14); 
@@ -139,9 +139,9 @@ void deserialize_file_header_test() {
     header.is_compressed = true;
     header.file_count = 0x123456789ABCDEF0;
     INIT_BINARY(binary);
-    serialize_file_header(header, &binary);
+    ser_fheader(header, &binary);
     INIT_FILE_HEADER(deserialized_header);
-    deserialize_file_header(&binary, &deserialized_header);
+    deser_bin_fheader(&binary, &deserialized_header);
     assert(deserialized_header.version.major == header.version.major);
     assert(deserialized_header.version.minor == header.version.minor);
     assert(deserialized_header.version.patch == header.version.patch);
@@ -149,6 +149,38 @@ void deserialize_file_header_test() {
     assert(deserialized_header.is_compressed == header.is_compressed);
     assert(deserialized_header.file_count == header.file_count);
     FREE_BINARY(binary);
+    END_TEST_SUITE;
+}
+
+void deserialize_bufreader_file_header_test() {
+    INIT_TEST_SUITE;
+    char *filename = "deserialize_bufreader_file_header_test.bin";
+    INIT_FILE_HEADER(header);
+    header.is_encrypted = true;
+    header.is_compressed = true;
+    header.file_count = 0x123456789ABCDEF0;
+    INIT_BINARY(binary);
+    ser_fheader(header, &binary);
+    // write to file
+    FILE *fp = fopen(filename, "wb");
+    fwrite(binary.data, sizeof(byte_t), binary.length, fp);
+    fclose(fp);
+
+    // read from file
+    fp = fopen(filename, "rb");
+    INIT_BUFREADER(bufreader, fp, 10);
+    INIT_FILE_HEADER(deserialized_header);
+    deser_br_fheader(&bufreader, &deserialized_header);
+    assert(deserialized_header.version.major == header.version.major);
+    assert(deserialized_header.version.minor == header.version.minor);
+    assert(deserialized_header.version.patch == header.version.patch);
+    assert(deserialized_header.is_encrypted == header.is_encrypted);
+    assert(deserialized_header.is_compressed == header.is_compressed);
+    assert(deserialized_header.file_count == header.file_count);
+    FREE_BINARY(binary);
+    FREE_BUFREADER(bufreader);
+    fclose(fp);
+    remove(filename);
     END_TEST_SUITE;
 }
 
@@ -161,5 +193,6 @@ int main () {
     serialize_file_count_test();
     serialize_file_header_test();
     deserialize_file_header_test();
+    deserialize_bufreader_file_header_test();
     return 0;
 }

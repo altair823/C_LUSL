@@ -10,6 +10,7 @@
 #include <sys/stat.h>
 
 #include "binary.h"
+#include "bufread.h"
 
 #define BUFFER_SIZE 1024
 #define SHA3_256 ///< SHA-3 256-bit hash.
@@ -83,7 +84,7 @@ bool fmeta(char *filename, meta_t *meta);
  * @param bin Binary to serialize metadata to.
  * @return True if successful, false otherwise.
 */
-bool serialize_meta(meta_t *meta, binary_t *bin);
+bool ser_meta(meta_t *meta, binary_t *bin);
 
 /**
  * @brief Deserialize metadata.
@@ -91,8 +92,11 @@ bool serialize_meta(meta_t *meta, binary_t *bin);
  * @param bin Binary to deserialize from.
  * @return True if successful, false otherwise.
 */
-bool deserialize_meta(meta_t *meta, binary_t *bin);
+bool deser_bin_meta(binary_t *bin, meta_t *meta);
 
+bool deser_br_meta(bufreader_t *reader, meta_t *meta);
+
+#define INIT_META(x) meta_t x = { NULL, 0, { NULL_HASH, }, false, false, false, 0 } ///< Initialize metadata.
 #define FREE_META(x) free(x.path); ///< Free metadata.
 
 #endif

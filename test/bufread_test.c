@@ -58,7 +58,8 @@ void chunk_test() {
 
 void read_bufreader_test() {
     INIT_TEST_SUITE;
-    FILE *file = fopen("read_bufreader_test.txt", "w");
+    char *filename = "read_bufreader_test.txt";
+    FILE *file = fopen(filename, "w");
     assert(file != NULL);
     for (int i = 0; i < 100; i++) {
         fprintf(file, "%d", i);
@@ -72,7 +73,7 @@ void read_bufreader_test() {
     // |0123456789|
     INIT_BUFREADER(bufreader, file, 10);
     INIT_BINARY(binary_fit_in_buf);
-    assert(read_bufreader(&bufreader, 10, &binary_fit_in_buf));
+    assert(read_bufreader(&bufreader, &binary_fit_in_buf, 10));
     assert(binary_fit_in_buf.length == 10);
     for (int i = 0; i < binary_fit_in_buf.length; i++) {
         assert(binary_fit_in_buf.data[i] == i + '0');
@@ -82,7 +83,7 @@ void read_bufreader_test() {
     // Test read_bufreader when binary is smaller than buffer.
     // |101112----|
     INIT_BINARY(binary_smaller_than_buf);
-    assert(read_bufreader(&bufreader, 6, &binary_smaller_than_buf));
+    assert(read_bufreader(&bufreader, &binary_smaller_than_buf, 6));
     assert(binary_smaller_than_buf.length == 6);
     assert(binary_smaller_than_buf.data[0] == '1');
     assert(binary_smaller_than_buf.data[1] == '0');
@@ -96,7 +97,7 @@ void read_bufreader_test() {
     // |------1314|
     // |15161718--|
     INIT_BINARY(binary_over_buf);
-    assert(read_bufreader(&bufreader, 12, &binary_over_buf));
+    assert(read_bufreader(&bufreader, &binary_over_buf, 12));
     assert(binary_over_buf.length == 12);
     assert(binary_over_buf.data[0] == '1');
     assert(binary_over_buf.data[1] == '3');
@@ -118,7 +119,7 @@ void read_bufreader_test() {
     // |2526272829|
     // |303-------|
     INIT_BINARY(binary_bigger_than_buf);
-    assert(read_bufreader(&bufreader, 25, &binary_bigger_than_buf));
+    assert(read_bufreader(&bufreader, &binary_bigger_than_buf, 25));
     assert(binary_bigger_than_buf.length == 25);
     assert(binary_bigger_than_buf.data[0] == '1');
     assert(binary_bigger_than_buf.data[1] == '9');
@@ -150,7 +151,7 @@ void read_bufreader_test() {
     // Test read_bufreader when binary is padding the buffer.
     // |---1323334|
     INIT_BINARY(binary_padding_buf);
-    assert(read_bufreader(&bufreader, 7, &binary_padding_buf));
+    assert(read_bufreader(&bufreader, &binary_padding_buf, 7));
     assert(binary_padding_buf.length == 7);
     assert(binary_padding_buf.data[0] == '1');
     assert(binary_padding_buf.data[1] == '3');
@@ -164,7 +165,7 @@ void read_bufreader_test() {
     // Temp binary for next test.
     // |353-------|
     INIT_BINARY(binary_for_temp);
-    assert(read_bufreader(&bufreader, 3, &binary_for_temp));
+    assert(read_bufreader(&bufreader, &binary_for_temp, 3));
     assert(binary_for_temp.length == 3);
     assert(binary_for_temp.data[0] == '3');
     assert(binary_for_temp.data[1] == '5');
@@ -175,7 +176,7 @@ void read_bufreader_test() {
     // |---6373839|
     // |4041424344|
     INIT_BINARY(binary_big_padding_buf);
-    assert(read_bufreader(&bufreader, 17, &binary_big_padding_buf));
+    assert(read_bufreader(&bufreader, &binary_big_padding_buf, 17));
     assert(binary_big_padding_buf.length == 17);
     assert(binary_big_padding_buf.data[0] == '6');
     assert(binary_big_padding_buf.data[1] == '3');
@@ -196,7 +197,9 @@ void read_bufreader_test() {
     assert(binary_big_padding_buf.data[16] == '4');
     FREE_BINARY(binary_big_padding_buf);
 
+    FREE_BUFREADER(bufreader);
     fclose(file);
+    remove(filename);
     
     END_TEST_SUITE;
 }

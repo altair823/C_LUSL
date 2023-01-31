@@ -6,6 +6,7 @@
 
 #include "config.h"
 #include "binary.h"
+#include "bufread.h"
 
 /// File header label.
 #define FILE_LABEL "LUSL Serialized File"
@@ -16,7 +17,7 @@
  * @return True if successful, false otherwise.
  * @details The file label is stored as a non-null terminated string.
 */
-bool serialize_file_label(binary_t *binary);
+bool ser_flabel(binary_t *binary);
 
 /// Offset for version in file header.
 #define VERSION_START_OFFSET 0x01
@@ -51,14 +52,14 @@ enum v_cmp_result {
  * @param file_version Version of file.
  * @return Version compatibility.
 */
-enum v_cmp_result compare_version(version_t file_version);
+enum v_cmp_result cmp_version(version_t file_version);
 
 /**
  * @brief Convert version struct to byte.
  * @param version Version struct to convert.
  * @param byte Byte to store result in.
 */
-void serialize_version(version_t version, binary_t *byte);
+void ser_version(version_t version, binary_t *byte);
 
 /**
  * @brief The file header struct
@@ -79,7 +80,7 @@ typedef struct {
  * @param binary Byte array to store result in.
  * @return True if successful, false otherwise.
 */
-bool serialize_file_header(file_header_t header, binary_t *binary);
+bool ser_fheader(file_header_t header, binary_t *binary);
 
 /**
  * @brief Serialize flags to byte array.
@@ -87,7 +88,7 @@ bool serialize_file_header(file_header_t header, binary_t *binary);
  * @param binary Byte array to store result in.
  * @return True if successful, false otherwise.
 */
-bool serialize_flags(file_header_t header, binary_t *binary);
+bool ser_fflags(file_header_t header, binary_t *binary);
 
 /**
  * @brief Serialize file count to byte array.
@@ -98,7 +99,7 @@ bool serialize_flags(file_header_t header, binary_t *binary);
  * endian encoding. The first byte is the length of the byte array, and 
  * the remaining bytes are the file count.
 */
-bool serialize_file_count(file_header_t header, binary_t *binary);
+bool ser_fcount(file_header_t header, binary_t *binary);
 
 /**
  * @brief Deserialize file header from byte array.
@@ -106,6 +107,14 @@ bool serialize_file_count(file_header_t header, binary_t *binary);
  * @param new_header File header to store result in.
  * @return True if successful, false otherwise.
 */
-bool deserialize_file_header(binary_t *binary, file_header_t *new_header);
+bool deser_bin_fheader(binary_t *binary, file_header_t *new_header);
+
+/**
+ * @brief Deserialize file header from buffer reader.
+ * @param reader Buffer reader to deserialize from.
+ * @param new_header File header to store result in.
+ * @return True if successful, false otherwise.
+*/
+bool deser_br_fheader(bufreader_t *reader, file_header_t *new_header);
 
 #endif

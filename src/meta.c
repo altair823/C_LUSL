@@ -65,7 +65,7 @@ bool fmeta(char *filename, meta_t *meta) {
     }
 }
 
-bool serialize_meta(meta_t *meta, binary_t *bin) {
+bool ser_meta(meta_t *meta, binary_t *bin) {
     CHECK_BINARY_PTR_NULL(bin)
     else if (meta->path_length > 0xFFFF) {
         printf("Path is too long. (>65535)\n");
@@ -116,11 +116,8 @@ bool serialize_meta(meta_t *meta, binary_t *bin) {
     return true;
 }
 
-bool deserialize_meta(meta_t *meta, binary_t *bin) {
-    if (bin->data == NULL) {
-        printf("Binary is empty.\n");
-        return false; // Binary is empty.
-    }
+bool deser_bin_meta(binary_t *bin, meta_t *meta) {
+    CHECK_BINARY_PTR_NOT_NULL(bin);
 
     // Deserialize path length.
     uint16_t path_length = (bin->data[0] << 8) | bin->data[1];
@@ -148,6 +145,55 @@ bool deserialize_meta(meta_t *meta, binary_t *bin) {
 
     // Deserialize hash.
     memcpy(meta->hash, bin->data + 3 + path_length + size_bytes_length, HASH_SIZE);
+
+    return true;
+}
+
+bool deser_br_meta(bufreader_t *reader, meta_t *meta) {
+    CHECK_BUFREADER_PTR_NOT_NULL(reader);
+
+    // Deserialize path length.
+    INIT_BINARY(path_length_bytes);
+    read_bufreader(reader, &path_length_bytes, 2);
+    uint16_t path_length = (path_length_bytes.data[0] << 8) | 
+        path_length_bytes.data[1];
+    FREE_BINARY(path_length_bytes);
+
+    // Deserialize path.
+    INIT_BINARY(path_bin);
+    read_bufreader(reader, &path_bin, path_length);
+    meta->path = (char *) malloc(sizeof(char) * (path_length + 1));
+    memcpy(meta->path, path_bin.data, path_length);
+    meta->path[path_length] = '\0';
+    meta->path_length = path_length;
+    FREE_BINARY(path_bin);
+
+    // Deserialize flags.
+    INIT_BINARY(flags_bin);
+    read_bufreader(reader, &flags_bin, 1);
+    uint8_t flags = flags_bin.data[0];
+    meta->is_file = flags & IS_FILE;
+    meta->is_dir = flags & IS_DIR;
+    meta->is_link = flags & IS_LINK;
+    FREE_BINARY(flags_bin);
+
+    // Deserialize file size.
+    INIT_BINARY(size_bytes_bin);
+    uint8_t size_bytes_length = flags & 0x0F;
+    read_bufreader(reader, &size_bytes_bin, size_bytes_length);
+    INIT_BINARY(size_bytes);
+    size_bytes.length = size_bytes_length;
+    size_bytes.data = (byte_t *) malloc(sizeof(byte_t) * size_bytes_length);
+    memcpy(size_bytes.data, size_bytes_bin.data, size_bytes_length);
+    meta->size = le_arr_to_uint64(&size_bytes);
+    FREE_BINARY(size_bytes);
+    FREE_BINARY(size_bytes_bin);
+
+    // Deserialize hash.
+    INIT_BINARY(hash_bin);
+    read_bufreader(reader, &hash_bin, HASH_SIZE);
+    memcpy(meta->hash, hash_bin.data, HASH_SIZE);
+    FREE_BINARY(hash_bin);
 
     return true;
 }

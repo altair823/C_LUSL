@@ -68,7 +68,7 @@ void fmeta_test() {
     for (int i = 0; i < 1000; i++) {
         fprintf(file, "%d ", i);
     }
-    meta_t meta;
+    INIT_META(meta);
     fmeta(filename, &meta);
     assert(strcmp(meta.path, filename) == 0);
     struct stat st;
@@ -96,10 +96,10 @@ void serialize_test() {
         fprintf(file, "%d ", i);
     }
     fclose(file);
-    meta_t meta;
+    INIT_META(meta);
     fmeta(filename, &meta);
     INIT_BINARY(binary);
-    serialize_meta(&meta, &binary);
+    ser_meta(&meta, &binary);
     
     // check if serialized data is correct
     // Check path
@@ -137,21 +137,21 @@ void serialize_test() {
     END_TEST_SUITE;
 }
 
-void deserialize_test() {
+void deserialize_bin_test() {
     INIT_TEST_SUITE;
-    char *filename = "test/deserialize_test.bin";
+    char *filename = "deserialize_bin_test.bin";
     FILE *file = fopen(filename, "wb");
     assert(file != NULL);
     for (int i = 0; i < 1000; i++) {
         fprintf(file, "%d ", i);
     }
     fclose(file);
-    meta_t meta;
+    INIT_META(meta);
     fmeta(filename, &meta);
     INIT_BINARY(binary);
-    serialize_meta(&meta, &binary);
-    meta_t meta2;
-    deserialize_meta(&meta2, &binary);
+    ser_meta(&meta, &binary);
+    INIT_META(meta2);
+    deser_bin_meta(&binary, &meta2);
     assert(strcmp(meta.path, meta2.path) == 0);
     assert(meta.size == meta2.size);
     assert(meta.is_dir == meta2.is_dir);
@@ -166,11 +166,54 @@ void deserialize_test() {
     END_TEST_SUITE;
 }
 
+void deserialize_bufreader_test() {
+    INIT_TEST_SUITE;
+    char *origin_filename = "deserialize_bufreader_test.txt";
+    FILE *file = fopen(origin_filename, "wb");
+    assert(file != NULL);
+    for (int i = 0; i < 1000; i++) {
+        fprintf(file, "%d ", i);
+    }
+    fclose(file);
+    INIT_META(meta);
+    fmeta(origin_filename, &meta);
+    INIT_BINARY(binary);
+    ser_meta(&meta, &binary);
+    // write to file.
+    char *meta_filename = "deserialize_bufreader_test.bin";
+    FILE *wfile = fopen(meta_filename, "wb");
+    assert(wfile != NULL);
+    fwrite(binary.data, sizeof(byte_t), binary.length, wfile);
+    fclose(wfile);
+
+    // read from file.
+    FILE *meta_file = fopen(meta_filename, "rb");
+    INIT_BUFREADER(bufreader, meta_file, 10);
+    INIT_META(meta2);
+    deser_br_meta(&bufreader, &meta2);
+    assert(strcmp(meta.path, meta2.path) == 0);
+    assert(meta.size == meta2.size);
+    assert(meta.is_dir == meta2.is_dir);
+    assert(meta.is_file == meta2.is_file);
+    assert(meta.is_link == meta2.is_link);
+    assert(memcmp(meta.hash, meta2.hash, HASH_SIZE) == 0);
+    FREE_BINARY(binary);
+
+    FREE_META(meta);
+    FREE_META(meta2);
+    FREE_BUFREADER(bufreader);
+    fclose(meta_file);
+    remove(origin_filename);
+    remove(meta_filename);
+    END_TEST_SUITE;
+}
+
 int main () {
     fhash_test();
     fflags_test();
     fmeta_test();
     serialize_test();
-    deserialize_test();
+    deserialize_bin_test();
+    deserialize_bufreader_test();
     return 0;
 }
