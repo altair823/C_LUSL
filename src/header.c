@@ -27,7 +27,7 @@ void ser_version(version_t version, binary_t *binary) {
     binary->data[2] = version.patch;
 }
 
-bool ser_fheader(file_header_t header, binary_t *binary) {
+bool ser_fheader(fheader_t *header, binary_t *binary) {
     CHECK_BINARY_PTR_NULL(binary);
 
     INIT_BINARY(file_label_binary);
@@ -38,7 +38,7 @@ bool ser_fheader(file_header_t header, binary_t *binary) {
     append_binary(binary, version_start_offset, 1);
 
     INIT_BINARY(version_bin);
-    ser_version(header.version, &version_bin);
+    ser_version(header->version, &version_bin);
     concat_binary(binary, &version_bin);
 
     INIT_BINARY(flags_binary);
@@ -51,24 +51,24 @@ bool ser_fheader(file_header_t header, binary_t *binary) {
     return true;
 }
 
-bool ser_fflags(file_header_t header, binary_t *binary) {
+bool ser_fflags(fheader_t *header, binary_t *binary) {
     CHECK_BINARY_PTR_NULL(binary);
     binary->length = 1;
     binary->data = (uint8_t *)malloc(binary->length);
     binary->data[0] = 0;
-    if (header.is_encrypted) {
+    if (header->is_encrypted) {
         binary->data[0] |= ENCRYPTED_FLAG;
     }
-    if (header.is_compressed) {
+    if (header->is_compressed) {
         binary->data[0] |= COMPRESSED_FLAG;
     }
     return true;
 }
 
-bool ser_fcount(file_header_t header, binary_t *binary) {
+bool ser_fcount(fheader_t *header, binary_t *binary) {
     CHECK_BINARY_PTR_NULL(binary);
     INIT_BINARY(file_count_bytes);
-    uint64_to_le_arr(header.file_count, &file_count_bytes);
+    uint64_to_le_arr(header->file_count, &file_count_bytes);
     binary->length = file_count_bytes.length + 1;
     binary->data = (uint8_t *)malloc(binary->length);
     if (file_count_bytes.length > 0xFF) {
@@ -80,7 +80,7 @@ bool ser_fcount(file_header_t header, binary_t *binary) {
     return true;
 }
 
-bool deser_bin_fheader(binary_t *binary, file_header_t *new_header) {
+bool deser_bin_fheader(binary_t *binary, fheader_t *new_header) {
     CHECK_BINARY_PTR_NOT_NULL(binary);
     if (memcmp(binary->data, FILE_LABEL, sizeof(FILE_LABEL) - 1) != 0) {
         return false;
@@ -110,7 +110,7 @@ bool deser_bin_fheader(binary_t *binary, file_header_t *new_header) {
     return true;
 }
 
-bool deser_br_fheader(bufreader_t *reader, file_header_t *new_header) {
+bool deser_br_fheader(bufreader_t *reader, fheader_t *new_header) {
     CHECK_BUFREADER_PTR_NOT_NULL(reader);
     INIT_BINARY(label_binary);
     size_t label_length = sizeof(FILE_LABEL) - 1;

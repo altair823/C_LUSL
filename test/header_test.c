@@ -68,7 +68,7 @@ void serialize_flags_test() {
     header.is_encrypted = true;
     header.is_compressed = true;
     INIT_BINARY(binary);
-    ser_fflags(header, &binary);
+    ser_fflags(&header, &binary);
     assert(binary.data[0] == (ENCRYPTED_FLAG | COMPRESSED_FLAG));
     FREE_BINARY(binary);
     END_TEST_SUITE;
@@ -79,7 +79,7 @@ void serialize_file_count_test() {
     INIT_FILE_HEADER(header);
     header.file_count = 0x123456789ABCDEF0;
     INIT_BINARY(binary);
-    ser_fcount(header, &binary);
+    ser_fcount(&header, &binary);
     assert(binary.length == 9);
     assert(binary.data[0] == 8); // 8 bytes
     // little endian encoding of 0x123456789ABCDEF0
@@ -102,7 +102,7 @@ void serialize_file_header_test() {
     header.is_compressed = true; // Flags are 1 byte.
     header.file_count = 0x123456789ABCDEF0; // 9 bytes after serialized.
     INIT_BINARY(binary);
-    ser_fheader(header, &binary);
+    ser_fheader(&header, &binary);
     // -1 to exclude null terminator in FILE_LABEL 
     // and 4 bytes for version.
     assert(binary.length == sizeof(FILE_LABEL) - 1 + 14); 
@@ -139,7 +139,7 @@ void deserialize_file_header_test() {
     header.is_compressed = true;
     header.file_count = 0x123456789ABCDEF0;
     INIT_BINARY(binary);
-    ser_fheader(header, &binary);
+    ser_fheader(&header, &binary);
     INIT_FILE_HEADER(deserialized_header);
     deser_bin_fheader(&binary, &deserialized_header);
     assert(deserialized_header.version.major == header.version.major);
@@ -160,7 +160,7 @@ void deserialize_bufreader_file_header_test() {
     header.is_compressed = true;
     header.file_count = 0x123456789ABCDEF0;
     INIT_BINARY(binary);
-    ser_fheader(header, &binary);
+    ser_fheader(&header, &binary);
     // write to file
     FILE *fp = fopen(filename, "wb");
     fwrite(binary.data, sizeof(byte_t), binary.length, fp);

@@ -69,10 +69,10 @@ typedef struct {
     bool is_encrypted; ///< Flag whether file is encrypted.
     bool is_compressed; ///< Flag whether file is compressed.
     uint64_t file_count; ///< Number of files in file.
-} file_header_t;
+} fheader_t;
 
 ///< Create file header struct with current version of program.
-#define INIT_FILE_HEADER(header) file_header_t header = {{MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION}, false, false, 0}
+#define INIT_FILE_HEADER(header) fheader_t header = {{MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION}, false, false, 0}
 
 /**
  * @brief Serialize file header to byte array.
@@ -80,7 +80,7 @@ typedef struct {
  * @param binary Byte array to store result in.
  * @return True if successful, false otherwise.
 */
-bool ser_fheader(file_header_t header, binary_t *binary);
+bool ser_fheader(fheader_t *header, binary_t *binary);
 
 /**
  * @brief Serialize flags to byte array.
@@ -88,7 +88,7 @@ bool ser_fheader(file_header_t header, binary_t *binary);
  * @param binary Byte array to store result in.
  * @return True if successful, false otherwise.
 */
-bool ser_fflags(file_header_t header, binary_t *binary);
+bool ser_fflags(fheader_t *header, binary_t *binary);
 
 /**
  * @brief Serialize file count to byte array.
@@ -99,7 +99,7 @@ bool ser_fflags(file_header_t header, binary_t *binary);
  * endian encoding. The first byte is the length of the byte array, and 
  * the remaining bytes are the file count.
 */
-bool ser_fcount(file_header_t header, binary_t *binary);
+bool ser_fcount(fheader_t *header, binary_t *binary);
 
 /**
  * @brief Deserialize file header from byte array.
@@ -107,7 +107,7 @@ bool ser_fcount(file_header_t header, binary_t *binary);
  * @param new_header File header to store result in.
  * @return True if successful, false otherwise.
 */
-bool deser_bin_fheader(binary_t *binary, file_header_t *new_header);
+bool deser_bin_fheader(binary_t *binary, fheader_t *new_header);
 
 /**
  * @brief Deserialize file header from buffer reader.
@@ -115,6 +115,6 @@ bool deser_bin_fheader(binary_t *binary, file_header_t *new_header);
  * @param new_header File header to store result in.
  * @return True if successful, false otherwise.
 */
-bool deser_br_fheader(bufreader_t *reader, file_header_t *new_header);
+bool deser_br_fheader(bufreader_t *reader, fheader_t *new_header);
 
 #endif

@@ -47,6 +47,9 @@ typedef struct{
     uint64_t size; ///< Size of file.
 } meta_t;
 
+#define INIT_META(x) meta_t x = { NULL, 0, { NULL_HASH, }, false, false, false, 0 } ///< Initialize metadata.
+#define FREE_META(x) free(x.path); ///< Free metadata.
+
 /**
  * @brief Get the hash of a file.
  * @details Hash is calculated using SHA-3.
@@ -95,8 +98,5 @@ bool ser_meta(meta_t *meta, binary_t *bin);
 bool deser_bin_meta(binary_t *bin, meta_t *meta);
 
 bool deser_br_meta(bufreader_t *reader, meta_t *meta);
-
-#define INIT_META(x) meta_t x = { NULL, 0, { NULL_HASH, }, false, false, false, 0 } ///< Initialize metadata.
-#define FREE_META(x) free(x.path); ///< Free metadata.
 
 #endif
