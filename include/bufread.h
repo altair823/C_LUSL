@@ -1,3 +1,6 @@
+#ifndef BUFREAD_H
+#define BUFREAD_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -57,3 +60,5 @@ typedef struct _bufreader_t {
  * @return True if successful, false otherwise.
  */
 bool read_bufreader(bufreader_t *bufreader, binary_t *binary, size_t length);
+
+#endif // BUFREAD_H

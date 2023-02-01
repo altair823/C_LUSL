@@ -11,6 +11,7 @@ ${PROJECT_SOURCE_DIR}/src/meta.c
 ${PROJECT_SOURCE_DIR}/src/binary.c
 ${PROJECT_SOURCE_DIR}/src/header.c
 ${PROJECT_SOURCE_DIR}/src/bufread.c
+${PROJECT_SOURCE_DIR}/src/serializer.c
 )
 
 # main executable
@@ -28,3 +29,4 @@ add_test(NAME meta_test COMMAND meta_test)
 add_test(NAME binary_test COMMAND binary_test)
 add_test(NAME header_test COMMAND header_test)
 add_test(NAME bufread_test COMMAND bufread_test)
+add_test(NAME serializer_test COMMAND serializer_test)

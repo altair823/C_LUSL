@@ -52,6 +52,7 @@ void chunk_test() {
     assert(big_chunk.length == 90);
     FREE_CHUNK(big_chunk);
     fclose(file);
+    remove("bufread_test.txt");
 
     END_TEST_SUITE;
 }
@@ -59,14 +60,14 @@ void chunk_test() {
 void read_bufreader_test() {
     INIT_TEST_SUITE;
     char *filename = "read_bufreader_test.txt";
-    FILE *file = fopen(filename, "w");
-    assert(file != NULL);
+    FILE *wfile = fopen(filename, "w");
+    assert(wfile != NULL);
     for (int i = 0; i < 100; i++) {
-        fprintf(file, "%d", i);
+        fprintf(wfile, "%d", i);
     }
-    fclose(file);
+    fclose(wfile);
 
-    file = fopen("bufread_test.txt", "rb");
+    FILE *file = fopen(filename, "rb");
     assert(file != NULL);
 
     // Test read_bufreader when binary can fit in buffer.

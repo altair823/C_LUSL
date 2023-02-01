@@ -9,6 +9,7 @@ ${PROJECT_SOURCE_DIR}/src/meta.c
 ${PROJECT_SOURCE_DIR}/src/binary.c
 ${PROJECT_SOURCE_DIR}/src/header.c
 ${PROJECT_SOURCE_DIR}/src/bufread.c
+${PROJECT_SOURCE_DIR}/src/serializer.c
 )
 
 add_executable(sha_test sha_test.c ${SOURCES})
@@ -25,3 +26,6 @@ target_include_directories(header_test PUBLIC ../include)
 
 add_executable(bufread_test bufread_test.c ${SOURCES})
 target_include_directories(bufread_test PUBLIC ../include)
+
+add_executable(serializer_test serializer_test.c ${SOURCES})
+target_include_directories(serializer_test PUBLIC ../include)
