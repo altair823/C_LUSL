@@ -36,7 +36,9 @@ jobs:
       run: ctest -C ${{env.BUILD_TYPE}} -V
       
     - name: Actions for Discord
-      uses: Ilshidur/action-discord@0.3.2
+      env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      uses: Ilshidur/action-discord@master
       with:
         # The message to display in the Discord message.
         args: 'The test has been passed!'
