@@ -5,6 +5,7 @@ set(CMAKE_C_STANDARD 11)
 
 set(SOURCES 
 ${PROJECT_SOURCE_DIR}/src/sha3.c
+${PROJECT_SOURCE_DIR}/src/md5.c
 ${PROJECT_SOURCE_DIR}/src/meta.c
 ${PROJECT_SOURCE_DIR}/src/binary.c
 ${PROJECT_SOURCE_DIR}/src/header.c
@@ -14,6 +15,9 @@ ${PROJECT_SOURCE_DIR}/src/serializer.c
 
 add_executable(sha_test sha_test.c ${SOURCES})
 target_include_directories(sha_test PUBLIC ../include)
+
+add_executable(md5_test md5_test.c ${SOURCES})
+target_include_directories(md5_test PUBLIC ../include)
 
 add_executable(meta_test meta_test.c ${SOURCES})
 target_include_directories(meta_test PUBLIC ../include)

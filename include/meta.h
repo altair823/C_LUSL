@@ -1,7 +1,6 @@
 #ifndef F_HASH_H
 #define F_HASH_H
 
-#include "sha3.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,22 +8,39 @@
 #include <string.h>
 #include <sys/stat.h>
 
+#include "sha3.h"
+#include "md5.h"
 #include "binary.h"
 #include "bufread.h"
 
 #define BUFFER_SIZE 1024
-#define SHA3_256 ///< SHA-3 256-bit hash.
+#define MD5 ///< MD5 hash.
+// #define SHA3_256 ///< SHA-3 256-bit hash.
 // #define SHA3_512 ///< SHA-3 512-bit hash.
 
 #define NULL_HASH '0' ///< Null hash value.
 
+#ifdef MD5
+#define HASH_SIZE 16 ///< Size of hash.
+#define INIT_CONTEXT(context) MD5Context context ///< Initialize MD5.
+#define INIT_HASH(context_ptr) md5Init(context_ptr) ///< Initialize MD5.
+#define UPDATE_HASH(context_ptr, input, len) md5Update(context_ptr, input, len) ///< Update MD5.
+#define FINALIZE_HASH(context_ptr, result) md5Finalize(context_ptr); result = (*context_ptr).digest ///< Finalize MD5.
+#endif
 #ifdef SHA3_256
 #define HASH_SIZE 32 ///< Size of hash.
-#define INIT_SHA3(x) sha3_Init256(x) ///< Initialize SHA-3.
+#define INIT_CONTEXT(context) sha3_context context ///< Initialize SHA-3.
+#define INIT_HASH(context_ptr) sha3_Init256(context_ptr) ///< Initialize SHA-3.
+#define UPDATE_HASH(context_ptr, input, len) sha3_Update(context_ptr, input, len) ///< Update SHA-3.
+#define FINALIZE_HASH(context_ptr, result) result = sha3_Finalize(context_ptr) ///< Finalize SHA-3.
+
 #endif
 #ifdef SHA3_512
 #define HASH_SIZE 64 ///< Size of hash.
-#define INIT_SHA3(x) sha3_Init512(x) ///< Initialize SHA-3.
+#define INIT_CONTEXT(context) sha3_context context ///< Initialize SHA-3.
+#define INIT_HASH(context_ptr) sha3_Init512(context_ptr) ///< Initialize SHA-3.
+#define UPDATE_HASH(context_ptr, input, len) sha3_Update(context_ptr, input, len) ///< Update SHA-3.
+#define FINALIZE_HASH(context_ptr, result) result = sha3_Finalize(context_ptr) ///< Finalize SHA-3.
 #endif
 
 #define FILL_NULL_HASH(x) for (int i = 0; i < HASH_SIZE; i++) { x[i] = NULL_HASH; } ///< Fill hash with null hash value.

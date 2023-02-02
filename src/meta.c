@@ -2,16 +2,22 @@
 
 void fhash(FILE *file, uint8_t *hash) {
     if (file) {
+    #ifdef MD5
+        MD5Context ctx;
+    #endif
+    #if defined(SHA3_256) || defined(SHA3_512)
         sha3_context ctx;
+    #endif
 
-        INIT_SHA3(&ctx);
+        INIT_HASH(&ctx);
 
         unsigned char data[BUFFER_SIZE];
         size_t n;
         while ((n = fread(data, 1, sizeof(unsigned char) * BUFFER_SIZE, file)) > 0) {
-            sha3_Update(&ctx, data, n);
+            UPDATE_HASH(&ctx, data, n);
         }
-        const uint8_t *src_hash = sha3_Finalize(&ctx);
+        uint8_t *src_hash;
+        FINALIZE_HASH(&ctx, src_hash);
         memcpy(hash, src_hash, HASH_SIZE);
     } else {
         FILL_NULL_HASH(hash);

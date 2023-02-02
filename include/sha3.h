@@ -62,7 +62,7 @@ enum SHA3_FLAGS sha3_SetFlags(void *priv, enum SHA3_FLAGS);
 
 void sha3_Update(void *priv, void const *bufIn, size_t len);
 
-void const *sha3_Finalize(void *priv);
+void *sha3_Finalize(void *priv);
 
 /* Single-call hashing */
 sha3_return_t sha3_HashBuffer( 

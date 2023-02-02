@@ -248,7 +248,7 @@ sha3_Update(void *priv, void const *bufIn, size_t len)
  * The padding block is 0x01 || 0x00* || 0x80. First 0x01 and last 0x80 
  * bytes are always present, but they can be the same byte.
  */
-void const *
+void *
 sha3_Finalize(void *priv)
 {
     sha3_context *ctx = (sha3_context *) priv;

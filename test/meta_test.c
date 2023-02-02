@@ -25,17 +25,18 @@ void fhash_test() {
     /* Compare actual hash of file. */
     FILE *file3 = fopen(filename, "rb");
     assert(file3 != NULL);
-    sha3_context ctx;
-    INIT_SHA3(&ctx);
+    INIT_CONTEXT(ctx);
+    INIT_HASH(&ctx);
     unsigned char data[100];
     size_t n;
     while ((n = fread(data, 1, sizeof(unsigned char) * 100, file3)) > 0) {
-        sha3_Update(&ctx, data, n);
+        UPDATE_HASH(&ctx, data, n);
     }
-    const uint8_t *hash2 = sha3_Finalize(&ctx);
+    const uint8_t *hash2;
+    FINALIZE_HASH(&ctx, hash2);
     fclose(file3);
-
-    assert(memcmp(hash, hash2, 32) == 0);
+    
+    assert(memcmp(hash, hash2, HASH_SIZE) == 0);
     remove(filename);
     END_TEST_SUITE;
 }

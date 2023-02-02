@@ -116,8 +116,8 @@ void serialize_test() {
     SET_OPTION(serializer, 0);
     serialize(&serializer);
     FREE_SERIALIZER(serializer);
-    remove(output_file);
-    remove_directory(root_dir);
+    // remove(output_file);
+    // remove_directory(root_dir);
     END_TEST_SUITE;
 }
 
