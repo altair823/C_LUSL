@@ -78,7 +78,7 @@ void init_serializer_test() {
     SET_OPTION(serializer, COMPRESSED_FLAG | ENCRYPTED_FLAG);
     assert(strcmp(serializer.root_dir, "./init_serializer_test") == 0);
     assert(strcmp(serializer.output_file, "./init_serializer_test/output") == 0);
-    assert(serializer.option == COMPRESSED_FLAG | ENCRYPTED_FLAG);
+    assert(serializer.option == (COMPRESSED_FLAG | ENCRYPTED_FLAG));
     assert(serializer.file_list != NULL);
     assert(serializer.file_list->top == 0);
     assert(serializer.file_list->size == DEFAULT_STACK_SIZE);

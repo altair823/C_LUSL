@@ -1,6 +1,6 @@
 #include "serializer.h"
 
-bool get_file_list(char *root_dir, stack_t *file_list) {
+bool get_file_list(char *root_dir, path_stack_t *file_list) {
     if (root_dir == NULL || file_list == NULL) {
         return false;
     }

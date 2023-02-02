@@ -21,7 +21,7 @@ void make_directory(const char* name) {
         closedir(dir);
         return;
     } else {
-    #ifdef __linux__
+    #ifndef _WIN32
         if (mkdir(name, 0777) == -1)
     #else
         if (_mkdir(name) == -1) 
@@ -33,39 +33,6 @@ void make_directory(const char* name) {
         else {
             return;
         }
-    }
-}
-
-int _remove_directory(const char* name) {
-    int success = -1;
-    DIR *dir = opendir(name);
-    if (dir) {
-        struct dirent *entry = readdir(dir);
-        while (!success && entry) {
-            if (entry->d_type == DT_DIR) {
-                if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
-                    char *path;
-                    path = (char *) malloc(sizeof(char *) * (strlen(name) + strlen(entry->d_name) + 2));
-                    memcpy(path, name, strlen(name));
-                    path[strlen(name)] = '/';
-                    memcpy(path + strlen(name) + 1, entry->d_name, strlen(entry->d_name) + 1);
-                    success = _remove_directory(path);
-                    free(path);
-                }
-            } else {
-                char *filename = (char *) malloc(sizeof(char *) * (strlen(name) + strlen(entry->d_name) + 2));
-                memcpy(filename, name, strlen(name));
-                filename[strlen(name)] = '/';
-                memcpy(filename + strlen(name) + 1, entry->d_name, strlen(entry->d_name) + 1);
-                success = remove(filename);
-                free(filename);
-            }
-            entry = readdir(dir);
-        }
-        closedir(dir);
-    }
-    if (!success) {
-        success = rmdir(name);
     }
 }
 

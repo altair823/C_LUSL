@@ -23,8 +23,8 @@ typedef struct _stack {
     char **data;
     size_t size;
     size_t top;
-} stack_t;
-#define INIT_STACK(x) stack_t x = {NULL, 0, 0}; \
+} path_stack_t;
+#define INIT_STACK(x) path_stack_t x = {NULL, 0, 0}; \
 MALLOC_STACK(x)
 
 #define MALLOC_STACK(x) x.data = malloc(DEFAULT_STACK_SIZE * sizeof(char *)); \
@@ -51,7 +51,7 @@ free(stack.data); stack.data = NULL; stack.size = 0; stack.top = 0
  * @param file_count Number of files.
  * @return True if successful, false otherwise.
 */
-bool get_file_list(char *root_dir, stack_t *file_list);
+bool get_file_list(char *root_dir, path_stack_t *file_list);
 
 /**
  * @brief The serializer struct
@@ -61,14 +61,14 @@ typedef struct {
     char *root_dir; ///< Root directory to serialize.
     char *output_file; ///< Output file path.
     uint8_t option; ///< Option of the serializer.
-    stack_t *file_list; ///< List of files to serialize.
+    path_stack_t *file_list; ///< List of files to serialize.
 } serializer_t;
 
 #define DEFAULT_FILE_LIST_SIZE 100
 
 #define INIT_SERIALIZER(x, root_dir, output_file_path) serializer_t x = \
 {root_dir, output_file_path, 0, NULL}; \
-x.file_list = malloc(sizeof(stack_t)); \
+x.file_list = malloc(sizeof(path_stack_t)); \
 MALLOC_STACK((*x.file_list)) ///< Initialize a serializer.
 
 #define FREE_SERIALIZER(x) FREE_STACK((*x.file_list)); \
