@@ -114,10 +114,14 @@ void serialize_test() {
 
     INIT_SERIALIZER(serializer, root_dir, output_file);
     SET_OPTION(serializer, 0);
-    serialize(&serializer);
+    if (serialize(&serializer)) {
+        assert(true);
+    } else {
+        assert(false && "serialize failed");
+    }
     FREE_SERIALIZER(serializer);
-    // remove(output_file);
-    // remove_directory(root_dir);
+    remove(output_file);
+    remove_directory(root_dir);
     END_TEST_SUITE;
 }
 
