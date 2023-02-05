@@ -4,10 +4,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 #include <assert.h>
-#include <ftw.h>
 
 #ifndef _WIN32
 #include <dirent.h>

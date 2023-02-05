@@ -5,15 +5,10 @@ project(c_lusl)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)    
 
-set(SOURCES 
-${PROJECT_SOURCE_DIR}/src/sha3.c
-${PROJECT_SOURCE_DIR}/src/md5.c
-${PROJECT_SOURCE_DIR}/src/meta.c
-${PROJECT_SOURCE_DIR}/src/binary.c
-${PROJECT_SOURCE_DIR}/src/header.c
-${PROJECT_SOURCE_DIR}/src/bufread.c
-${PROJECT_SOURCE_DIR}/src/serializer.c
-)
+
+file(GLOB SOURCES
+		"${PROJECT_SOURCE_DIR}/src/*.c"
+        )
 
 # main executable
 add_executable(c_lusl main.c ${SOURCES})
@@ -32,3 +27,4 @@ add_test(NAME binary_test COMMAND binary_test)
 add_test(NAME header_test COMMAND header_test)
 add_test(NAME bufread_test COMMAND bufread_test)
 add_test(NAME serializer_test COMMAND serializer_test)
+add_test(NAME deserializer_test COMMAND deserializer_test)
