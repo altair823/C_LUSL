@@ -1,6 +1,4 @@
 #include <assert.h>
-#include <dirent.h>
-
 #include "test_util.h"
 
 #include "serializer.h"
