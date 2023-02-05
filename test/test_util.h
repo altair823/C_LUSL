@@ -1,21 +1,23 @@
 #ifndef TEST_UTIL_H
 #define TEST_UTIL_H
 
-#include <sys/stat.h>
 #include <errno.h>
 #include <stdio.h>
-#include <sys/types.h>
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <unistd.h>
+
 
 #ifndef _WIN32
 #include <dirent.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #define MKDIR(path, mode) mkdir(path, mode)
 #elif _WIN32
 #include <windows.h>
+#include "stat_win.h"
 #define MKDIR(path, mode) _mkdir(path)
 #include "dirent_win.h"
 #endif
