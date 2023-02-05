@@ -16,6 +16,7 @@
 #include <unistd.h>
 #define MKDIR(path, mode) mkdir(path, mode)
 #elif _WIN32
+#include <direct.h>
 #include <windows.h>
 #include "stat_win.h"
 #define MKDIR(path, mode) _mkdir(path)
