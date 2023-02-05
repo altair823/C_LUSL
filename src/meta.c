@@ -11,9 +11,9 @@ void fhash(FILE *file, uint8_t *hash) {
 
         INIT_HASH(&ctx);
 
-        unsigned char data[BUFFER_SIZE];
+        unsigned char data[HASH_BUFFER_SIZE];
         size_t n;
-        while ((n = fread(data, 1, sizeof(unsigned char) * BUFFER_SIZE, file)) > 0) {
+        while ((n = fread(data, 1, sizeof(unsigned char) * HASH_BUFFER_SIZE, file)) > 0) {
             UPDATE_HASH(&ctx, data, n);
         }
         uint8_t *src_hash;
@@ -202,4 +202,12 @@ bool deser_br_meta(bufreader_t *reader, meta_t *meta) {
     FREE_BINARY(hash_bin);
 
     return true;
+}
+
+bool verify_hash(uint8_t *original_hash, char *new_filename) {
+    uint8_t new_hash[HASH_SIZE];
+    FILE *new_file = fopen(new_filename, "rb");
+    fhash(new_file, new_hash);
+    fclose(new_file);
+    return memcmp(original_hash, new_hash, HASH_SIZE) == 0;
 }

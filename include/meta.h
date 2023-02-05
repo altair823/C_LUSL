@@ -26,7 +26,7 @@
 #include "binary.h"
 #include "bufread.h"
 
-#define BUFFER_SIZE 1024
+#define HASH_BUFFER_SIZE 1024
 #define MD5 ///< MD5 hash.
 // #define SHA3_256 ///< SHA-3 256-bit hash.
 // #define SHA3_512 ///< SHA-3 512-bit hash.
@@ -126,6 +126,20 @@ bool ser_meta(meta_t *meta, binary_t *bin);
 */
 bool deser_bin_meta(binary_t *bin, meta_t *meta);
 
+/**
+ * @brief Serialize metadata.
+ * @param reader Buffer reader to serialize metadata from.
+ * @param meta Metadata to serialize.
+ * @return True if successful, false otherwise.
+*/
 bool deser_br_meta(bufreader_t *reader, meta_t *meta);
+
+/**
+ * @brief Verify hash of file.
+ * @param original_hash Original hash of file which is written on metadata.
+ * @param new_filename File to verify hash of.
+ * @return True if hash is correct, false otherwise.
+*/
+bool verify_hash(uint8_t *original_hash, char *new_filename);
 
 #endif

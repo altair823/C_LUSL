@@ -170,7 +170,11 @@ void deserialize_bufreader_file_header_test() {
     fp = fopen(filename, "rb");
     INIT_BUFREADER(bufreader, fp, 10);
     INIT_FILE_HEADER(deserialized_header);
-    deser_br_fheader(&bufreader, &deserialized_header);
+    if (!deser_br_fheader(&bufreader, &deserialized_header)) {
+        printf("Error deserializing file header.\n");
+        exit(1);
+    }
+
     assert(deserialized_header.version.major == header.version.major);
     assert(deserialized_header.version.minor == header.version.minor);
     assert(deserialized_header.version.patch == header.version.patch);

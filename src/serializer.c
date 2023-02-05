@@ -90,6 +90,9 @@ bool serialize(serializer_t *serializer) {
         }
         FREE_BUFREADER(input_file_reader);
         fclose(input_file);
+        #ifdef VERBOSE
+        printf("File %s is serialized.\n", filename);
+        #endif
         
         FREE_META(metadata);
     }
