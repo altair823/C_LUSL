@@ -2,7 +2,6 @@
 #define TEST_UTIL_H
 
 #include <sys/stat.h>
-#include <dirent.h>
 #include <errno.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -11,6 +10,15 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <unistd.h>
+
+#ifndef _WIN32
+#include <dirent.h>
+#define MKDIR(path, mode) mkdir(path, mode)
+#elif _WIN32
+#include <windows.h>
+#define MKDIR(path, mode) _mkdir(path)
+#include "dirent_win.h"
+#endif
 
 #define INIT_TEST_SUITE printf("%s...", __func__)
 #define END_TEST_SUITE printf("OK\n")
@@ -21,12 +29,7 @@ void make_directory(const char* name) {
         closedir(dir);
         return;
     } else {
-    #ifndef _WIN32
-        if (mkdir(name, 0777) == -1)
-    #else
-        if (_mkdir(name) == -1) 
-    #endif
-        {
+        if (MKDIR(name, 0777) == -1) {
             printf("Cannot create dir %s\n", name);\
             return;
         }
