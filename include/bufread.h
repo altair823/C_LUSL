@@ -7,6 +7,7 @@
 #include <assert.h>
 #include <string.h>
 
+#include "config.h"
 #include "binary.h"
 
 /**

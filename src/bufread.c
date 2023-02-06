@@ -2,6 +2,7 @@
 
 bool read_chunk(FILE *file, chunk_t *chunk, size_t chunk_size) {
     if (!file) {
+        DEBUG_MSG("File is NULL");
         return false;
     }
     CHECK_CHUNK_PTR_NULL(chunk);
@@ -26,17 +27,17 @@ bool read_chunk(FILE *file, chunk_t *chunk, size_t chunk_size) {
 bool read_bufreader(bufreader_t *bufreader, binary_t *binary, size_t length) {
     CHECK_BINARY_PTR_NULL(binary);
     if (!bufreader) {
-        assert(false && "bufreader is NULL");
+        DEBUG_MSG("bufreader is NULL");
         return false;
     }
     if (!bufreader->file) {
-        assert(false && "File in bufreader is NULL");
+        DEBUG_MSG("File in bufreader is NULL");
         return false;
     }
     // if there is no data in chunk, read new chunk from file.
     if (!bufreader->chunk.data) {
         if (!read_chunk(bufreader->file, &bufreader->chunk, bufreader->chunk_size)) {
-            assert(false && "Failed to read chunk");
+            DEBUG_MSG("Failed to read chunk");
             return false;
         }
         bufreader->current_offset = 0;
@@ -60,7 +61,7 @@ bool read_bufreader(bufreader_t *bufreader, binary_t *binary, size_t length) {
         while (counter + bufreader->chunk.length < length) {
             FREE_CHUNK(bufreader->chunk);
             if (!read_chunk(bufreader->file, &bufreader->chunk, bufreader->chunk_size)) {
-                assert(false && "Failed to read chunk");
+                DEBUG_MSG("Failed to read chunk");
                 return false;
             }
             memcpy(binary->data + counter, bufreader->chunk.data, bufreader->chunk.length);
@@ -69,7 +70,7 @@ bool read_bufreader(bufreader_t *bufreader, binary_t *binary, size_t length) {
         size_t new_offset = length - counter;
         FREE_CHUNK(bufreader->chunk);
         if (!read_chunk(bufreader->file, &bufreader->chunk, bufreader->chunk_size)) {
-            assert(false && "Failed to read chunk");
+            DEBUG_MSG("Failed to read chunk");
             return false;
         }
         memcpy(binary->data + counter, bufreader->chunk.data, new_offset);

@@ -26,7 +26,7 @@ file(GLOB SOURCES
 
 # main executable
 add_executable(c_lusl main.c ${SOURCES})
-target_include_directories(c_lusl PRIVATE include)
+target_include_directories(c_lusl PUBLIC include)
 # target_compile_options(c_lusl PUBLIC -Wall -Werror)
 
 # test executable

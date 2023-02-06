@@ -5,4 +5,14 @@
 #define MINOR_VERSION 1
 #define PATCH_VERSION 0
 
+#define DEBUG 0
+#if DEBUG == 1
+#define DEBUG_MSG(msg) assert(false && msg)
+#else
+#define DEBUG_MSG(msg) printf(msg); printf("\n")
+#endif
+#define VERBOSE 1
+
+// #define _WIN32
+
 #endif // CONFIG_H

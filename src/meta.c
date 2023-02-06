@@ -38,6 +38,7 @@ uint8_t fflags(FILE *file) {
         }
         return flags;
     } else {
+        DEBUG_MSG("File is NULL.\n");
         return 0x00;
     }
 }
@@ -48,6 +49,7 @@ uint64_t fsize(FILE *file) {
         fstat(fileno(file), &st);
         return st.st_size;
     } else {
+        DEBUG_MSG("File is NULL.\n");
         return 0;
     }
 }
@@ -56,6 +58,10 @@ bool fmeta(char *filename, meta_t *meta) {
     FILE *file = fopen(filename, "rb");
     if (file) {
         meta->path = (char *) malloc(sizeof(char *) * (strlen(filename) + 1));
+        if (meta->path == NULL) {
+            DEBUG_MSG("Failed to allocate memory for meta->path.\n");
+            return false;
+        }
         memcpy(meta->path, filename, strlen(filename) + 1);
         meta->path_length = strlen(filename);
         fhash(file, meta->hash);
@@ -67,6 +73,7 @@ bool fmeta(char *filename, meta_t *meta) {
         meta->is_link = flags & IS_LINK;
         return true;
     } else {
+        DEBUG_MSG("File is NULL.\n");
         return false;
     }
 }
@@ -74,7 +81,7 @@ bool fmeta(char *filename, meta_t *meta) {
 bool ser_meta(meta_t *meta, binary_t *bin) {
     CHECK_BINARY_PTR_NULL(bin)
     else if (meta->path_length > 0xFFFF) {
-        printf("Path is too long. (>65535)\n");
+        DEBUG_MSG("Path is too long. (>65535)\n");
         return false; // Path is too long.
     }
     

@@ -11,15 +11,16 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#ifndef _WIN32
-#include <dirent.h>
-#define MKDIR(path, mode) mkdir(path, mode)
-#elif _WIN32
+#ifdef _WIN32
 #include <windows.h>
 #define MKDIR(path, mode) _mkdir(path)
 #include "dirent_win.h"
+#elif _WIN32
+#include <dirent.h>
+#define MKDIR(path, mode) mkdir(path, mode)
 #endif
 
+#include "config.h"
 #include "header.h"
 #include "meta.h"
 #include "bufread.h"
@@ -35,7 +36,7 @@
 */
 bool mkdir_recursive(const char *path);
 
-#define BUFFER_SIZE 128
+#define DESER_BUFFER_SIZE 8192 ///< Buffer size for deserialization.
 
 typedef struct {
     char *input_file;

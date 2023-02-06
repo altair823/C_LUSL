@@ -15,6 +15,7 @@ bool concat_binary(binary_t *dest, binary_t *to_concat) {
     } else {
         dest->data = (uint8_t *) realloc(dest->data, sizeof(uint8_t) * (dest->length + to_concat->length));
         if (dest->data == NULL){
+            DEBUG_MSG("Failed to reallocate memory");
             return false;
         }
         memcpy(dest->data + dest->length, to_concat->data, to_concat->length);
@@ -28,6 +29,7 @@ bool concat_binary(binary_t *dest, binary_t *to_concat) {
 
 bool append_binary(binary_t *dest, byte_t *to_append, size_t length) {
     if (to_append == NULL){
+        DEBUG_MSG("to_append is NULL");
         return false;
     }
     // If dest is empty, just copy to_append to dest.
@@ -40,6 +42,7 @@ bool append_binary(binary_t *dest, byte_t *to_append, size_t length) {
     } else {
         dest->data = (uint8_t *) realloc(dest->data, sizeof(uint8_t) * (dest->length + length));
         if (dest->data == NULL){
+            DEBUG_MSG("Failed to reallocate memory");
             return false;
         }
         memcpy(dest->data + dest->length, to_append, length);
@@ -53,6 +56,7 @@ bool copy_binary(binary_t *src, binary_t *dest) {
     CHECK_BINARY_PTR_NULL(dest);
     dest->data = (uint8_t *) malloc(sizeof(uint8_t) * src->length);
     if (dest->data == NULL){
+        DEBUG_MSG("Failed to allocate memory");
         return false;
     }
     dest->length = src->length;
@@ -64,18 +68,18 @@ bool create_binary_ref(binary_t *src, binary_t *ref, size_t offset, size_t lengt
     CHECK_BINARY_PTR_NOT_NULL(src);
     CHECK_BINARY_PTR_NULL(ref);
     if (src->is_ref) {
-        assert(false && "Cannot create reference from a reference.");
         ref->data = NULL;
         ref->length = 0;
         ref->is_ref = false;
+        DEBUG_MSG("Cannot create reference from a reference.");
         return false;
     }
 
     if (offset + length > src->length){
-        assert(false && "Offset and length out of range.");
         ref->data = NULL;
         ref->length = 0;
         ref->is_ref = false;
+        DEBUG_MSG("Offset and length out of range.");
         return false;
     }
     ref->data = src->data + offset;
@@ -97,6 +101,7 @@ bool create_binary_ref(binary_t *src, binary_t *ref, size_t offset, size_t lengt
 
 bool uint64_to_le_arr(uint64_t num, binary_t *result) {
     if (result->data != NULL){
+        DEBUG_MSG("Result is not empty.");
         return false;
     }
     uint8_t temp[8];
@@ -113,11 +118,16 @@ bool uint64_to_le_arr(uint64_t num, binary_t *result) {
         }
     }
     if (index > 8) {
+        DEBUG_MSG("Invalid number.");
         return false;
     }
     uint8_t length = 8 - index;
     result->length = length;
     result->data = (uint8_t *) malloc(sizeof(uint8_t) * length);
+    if (result->data == NULL){
+        DEBUG_MSG("Failed to allocate memory.");
+        return false;
+    }
     
     // Save the meaningful numbers to result array in little-endian order.
     for (int i = 0; i < length; i++) {

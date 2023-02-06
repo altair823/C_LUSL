@@ -7,20 +7,21 @@
 #include <stdint.h>
 #include <string.h>
 
-#ifndef _WIN32
-#include <dirent.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#define MKDIR(path, mode) mkdir(path, mode)
-#elif _WIN32
+#ifdef _WIN32
 #include <direct.h>
 #include <windows.h>
 #include "stat_win.h"
 #include "dirent_win.h"
 #define MKDIR(path, mode) _mkdir(path)
+#else
+#include <dirent.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#define MKDIR(path, mode) mkdir(path, mode)
 #endif
 
+#include "config.h"
 #include "sha3.h"
 #include "md5.h"
 #include "binary.h"

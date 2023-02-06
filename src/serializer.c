@@ -19,14 +19,23 @@ bool get_file_list(char *root_dir, path_stack_t *file_list) {
                             char *path;
                             path = (char *) malloc(sizeof(char *) * (strlen(subroot_dir) + strlen(entry->d_name) + 2));
                             memcpy(path, subroot_dir, strlen(subroot_dir));
+                            printf("%s\n", path);
+                        #ifdef _WIN32
+                            path[strlen(subroot_dir)] = '\\';
+                        #else
                             path[strlen(subroot_dir)] = '/';
+                        #endif
                             memcpy(path + strlen(subroot_dir) + 1, entry->d_name, strlen(entry->d_name) + 1);
                             PUSH_STACK(dir_stack, path);
                         }
                     } else {
                         char *filename = (char *) malloc(sizeof(char *) * (strlen(subroot_dir) + strlen(entry->d_name) + 2));
                         memcpy(filename, subroot_dir, strlen(subroot_dir));
+                    #ifdef _WIN32
+                        filename[strlen(subroot_dir)] = '\\';
+                    #else
                         filename[strlen(subroot_dir)] = '/';
+                    #endif
                         memcpy(filename + strlen(subroot_dir) + 1, entry->d_name, strlen(entry->d_name) + 1);
                         PUSH_STACK((*file_list), filename);
                     }
@@ -47,16 +56,20 @@ bool serialize(serializer_t *serializer) {
         return false;
     }
     if (serializer->file_list == NULL) {
-        assert(false && "file_list is not initialized!");
+        DEBUG_MSG("file_list is not initialized!");
+        return false;
+    }
+    if (isDir(serializer->root_dir) == false) {
+        DEBUG_MSG("root_dir is not a directory!");
         return false;
     }
     if (!get_file_list(serializer->root_dir, serializer->file_list)) {
-        assert(false && "get_file_list failed!");
+        DEBUG_MSG("get_file_list failed!");
         return false;
     }
     FILE *output_file = fopen(serializer->output_file, "wb");
     if (output_file == NULL) {
-        assert(false && "Cannot open output file!");
+        DEBUG_MSG("Cannot open output file!");
         return false;
     }
     // Write file header
@@ -66,7 +79,7 @@ bool serialize(serializer_t *serializer) {
     header.file_count = serializer->file_list->top;
     
     if (!write_fheader(output_file, &header)) {
-        assert(false && "write_fheader failed!");
+        DEBUG_MSG("write_fheader failed!");
         return false;
     }
 
@@ -77,15 +90,15 @@ bool serialize(serializer_t *serializer) {
         INIT_META(metadata);
         fmeta(filename, &metadata);
         if (write_fmeta(output_file, &metadata) == false) {
-            assert(false && "write_fmeta failed!");
+            DEBUG_MSG("write_fmeta failed!");
             return false;
         }
 
         // Write file data
         FILE *input_file = fopen(filename, "rb");
-        INIT_BUFREADER(input_file_reader, input_file, 1024);
+        INIT_BUFREADER(input_file_reader, input_file, SER_BUFFER_SIZE);
         if (write_fdata(output_file, &input_file_reader, metadata.size) == false) {
-            assert(false && "write_fdata failed!");
+            DEBUG_MSG("write_fdata failed!");
             return false;
         }
         FREE_BUFREADER(input_file_reader);
@@ -103,12 +116,12 @@ bool serialize(serializer_t *serializer) {
 bool write_fheader(FILE *output_file, fheader_t *fheader) {
     INIT_BINARY(header_binary);
     if (!ser_fheader(fheader, &header_binary)) {
-        assert(false && "ser_fheader failed!");
+        DEBUG_MSG("ser_fheader failed!");
         return false;
     }
     if (fwrite(header_binary.data, sizeof(char), header_binary.length, output_file) 
     != header_binary.length) {
-        assert(false && "fwrite failed!");
+        DEBUG_MSG("fwrite failed!");
         return false;
     }
     FREE_BINARY(header_binary);
@@ -118,12 +131,12 @@ bool write_fheader(FILE *output_file, fheader_t *fheader) {
 bool write_fmeta(FILE *output_file, meta_t *fmeta) {
     INIT_BINARY(meta_binary);
     if (!ser_meta(fmeta, &meta_binary)) {
-        assert(false && "ser_fmeta failed!");
+        DEBUG_MSG("ser_fmeta failed!");
         return false;
     }
     if (fwrite(meta_binary.data, sizeof(char), meta_binary.length, output_file) 
     != meta_binary.length) {
-        assert(false && "fwrite failed!");
+        DEBUG_MSG("fwrite failed!");
         return false;
     }
     FREE_BINARY(meta_binary);
@@ -135,11 +148,11 @@ bool write_fdata(FILE *output_file, bufreader_t *input_file_reader, size_t fsize
     while (fsize > buffer_size) {
         INIT_BINARY(data_binary);
         if (!read_bufreader(input_file_reader, &data_binary, buffer_size)) {
-            assert(false && "read_bufreader failed!");
+            DEBUG_MSG("read_bufreader failed!");
             return false;
         }
         if (fwrite(data_binary.data, sizeof(char), buffer_size, output_file) != buffer_size) {
-            assert(false && "fwrite failed!");
+            DEBUG_MSG("fwrite failed!");
             return false;
         }
         fsize -= buffer_size;
@@ -148,14 +161,20 @@ bool write_fdata(FILE *output_file, bufreader_t *input_file_reader, size_t fsize
     if (fsize > 0) {
         INIT_BINARY(data_binary);
         if (!read_bufreader(input_file_reader, &data_binary, fsize)) {
-            assert(false && "read_bufreader failed!");
+            DEBUG_MSG("read_bufreader failed!");
             return false;
         }
         if (fwrite(data_binary.data, sizeof(char), fsize, output_file) != fsize) {
-            assert(false && "fwrite failed!");
+            DEBUG_MSG("fwrite failed!");
             return false;
         }
         FREE_BINARY(data_binary);
     }
     return true;
+}
+
+int isDir(const char* fileName) {
+    struct stat path;
+    stat(fileName, &path);
+    return S_ISDIR(path.st_mode);
 }

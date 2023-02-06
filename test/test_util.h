@@ -9,19 +9,21 @@
 #include <stdbool.h>
 
 
-#ifndef _WIN32
-#include <dirent.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#define MKDIR(path, mode) mkdir(path, mode)
-#elif _WIN32
+#ifdef _WIN32
 #include <direct.h>
 #include <windows.h>
 #include "stat_win.h"
 #define MKDIR(path, mode) _mkdir(path)
 #include "dirent_win.h"
+#else
+#include <dirent.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#define MKDIR(path, mode) mkdir(path, mode)
 #endif
+
+
 
 #define INIT_TEST_SUITE printf("%s...", __func__)
 #define END_TEST_SUITE printf("OK\n")
@@ -56,7 +58,7 @@ int remove_directory(const char *path) {
             if (!strcmp(p->d_name, ".") || !strcmp(p->d_name, ".."))
                 continue;
             len = path_len + strlen(p->d_name) + 2; 
-            buf = malloc(len);
+            buf = (char *)malloc(len);
             if (buf) {
                 struct stat statbuf;
                 snprintf(buf, len, "%s/%s", path, p->d_name);

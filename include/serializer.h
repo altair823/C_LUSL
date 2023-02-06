@@ -13,6 +13,8 @@
 #include "dirent_win.h"
 #endif
 
+#include "config.h"
+
 #include "header.h"
 #include "meta.h"
 #include "bufread.h"
@@ -62,6 +64,7 @@ typedef struct {
     path_stack_t *file_list; ///< List of files to serialize.
 } serializer_t;
 
+#define SER_BUFFER_SIZE 8192 ///< Buffer size of the serializer.
 #define DEFAULT_FILE_LIST_SIZE 100
 
 #define INIT_SERIALIZER(x, root_dir, output_file_path) serializer_t x = \
@@ -109,5 +112,7 @@ bool write_fmeta(FILE *output_file, meta_t *fmeta);
  * @return True if successful, false otherwise.
 */
 bool write_fdata(FILE *output_file, bufreader_t *input_file_reader, size_t fsize);
+
+int isDir(const char* fileName);
 
 #endif // SERIALIZER_H

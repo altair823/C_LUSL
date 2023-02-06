@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <assert.h>
+#include "config.h"
 
 typedef uint8_t byte_t;
 

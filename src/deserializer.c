@@ -15,6 +15,7 @@ bool mkdir_recursive(const char *path) {
             *path_ptr = '\0';
             if (MKDIR(path_copy, 0777) == -1 && errno != EEXIST) {
                 free(path_copy);
+                DEBUG_MSG("Cannot create directory!");
                 return false;
             }
             *path_ptr = '/';
@@ -33,32 +34,32 @@ bool deserialize(deserializer_t *deserializer) {
     }
     FILE *input_file = fopen(deserializer->input_file, "rb");
     if (input_file == NULL) {
-        assert(false && "Cannot open input file!");
+        DEBUG_MSG("Cannot open input file!");
         return false;
     }
-    INIT_BUFREADER(input_file_reader, input_file, BUFFER_SIZE);
+    INIT_BUFREADER(input_file_reader, input_file, DESER_BUFFER_SIZE);
     INIT_FILE_HEADER(header);
     if (!read_header(&header, &input_file_reader)) {
-        assert(false && "Cannot read header!");
+        DEBUG_MSG("Cannot read header!");
         return false;
     }
     if (cmp_version(header.version) == VERSION_INCOMPATIBLE) {
-        assert(false && "Version mismatch!");
+        DEBUG_MSG("Version mismatch!");
         return false;
     }
     if (header.is_encrypted) {
-        assert(false && "Encrypted file is not supported!");
+        DEBUG_MSG("Encrypted file is not supported!");
         return false;
     }
     if (header.is_compressed) {
-        assert(false && "Compressed file is not supported!");
+        DEBUG_MSG("Compressed file is not supported!");
         return false;
     }
     for (size_t i = 0; i < header.file_count; i++) {
         INIT_META(metadata);
         // Read metadata
         if (!deser_br_meta(&input_file_reader, &metadata)) {
-            assert(false && "Cannot read metadata!");
+            DEBUG_MSG("Cannot read metadata!");
             return false;
         }
         for (size_t j = 0; j < metadata.path_length; j++) {
@@ -77,20 +78,20 @@ bool deserialize(deserializer_t *deserializer) {
         strlen(metadata.path) + 2));
         sprintf(output_path, "%s/%s", deserializer->output_dir, metadata.path);
         if (!mkdir_recursive(output_path)) {
-            assert(false && "Cannot create directory!");
+            DEBUG_MSG("Cannot create directory!");
             return false;
         }
         // Read file data and write to file.
         FILE *output_file = fopen(output_path, "wb");
         if (output_file == NULL) {
-            assert(false && "Cannot open output file!");
+            DEBUG_MSG("Cannot open output file!");
             return false;
         }
         for (size_t counter = 0; counter < metadata.size;) {
             INIT_BINARY(binary);
-            size_t buf_read_size = (metadata.size - counter) > BUFFER_SIZE ? BUFFER_SIZE : (metadata.size - counter);
+            size_t buf_read_size = (metadata.size - counter) > DESER_BUFFER_SIZE ? DESER_BUFFER_SIZE : (metadata.size - counter);
             if (!read_bufreader(&input_file_reader, &binary, buf_read_size)) {
-                assert(false && "Cannot read binary!");
+                DEBUG_MSG("Cannot read binary!");
                 return false;
             }
             fwrite(binary.data, sizeof(char), buf_read_size, output_file);
@@ -100,7 +101,7 @@ bool deserialize(deserializer_t *deserializer) {
         fclose(output_file);
 
         if (!verify_hash(metadata.hash, output_path)) {
-            assert(false && "Hash mismatch!");
+            DEBUG_MSG("Hash mismatch!");
             return false;
         }
         free(output_path);
@@ -117,7 +118,7 @@ bool read_header(fheader_t *header, bufreader_t *input_file_reader) {
         return false;
     }
     if (!deser_br_fheader(input_file_reader, header)) {
-        assert(false && "Cannot read header!");
+        DEBUG_MSG("Cannot read header!");
         return false;
     }
     return true;    

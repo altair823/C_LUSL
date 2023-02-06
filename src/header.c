@@ -115,7 +115,7 @@ bool deser_br_fheader(bufreader_t *reader, fheader_t *new_header) {
     INIT_BINARY(label_binary);
     size_t label_length = sizeof(FILE_LABEL) - 1;
     if (!read_bufreader(reader, &label_binary, label_length)) {
-        printf("Failed to read label\n");
+        DEBUG_MSG("Failed to read label");
         return false;
     }
     if (memcmp(label_binary.data, FILE_LABEL, sizeof(FILE_LABEL) - 1) != 0) {
@@ -127,7 +127,7 @@ bool deser_br_fheader(bufreader_t *reader, fheader_t *new_header) {
         return false;
     }
     if (version_binary.data[0] != VERSION_START_OFFSET) {
-        printf("Version start offset is incorrect\n");
+        DEBUG_MSG("Version start offset is incorrect");
         return false;
     }
     EMPTY_VERSION(version);
@@ -135,14 +135,14 @@ bool deser_br_fheader(bufreader_t *reader, fheader_t *new_header) {
     version.minor = version_binary.data[2];
     version.patch = version_binary.data[3];
     if (cmp_version(version) == VERSION_INCOMPATIBLE) {
-        printf("Version is incompatible\n");
+        DEBUG_MSG("Version is incompatible");
         return false;
     }
     new_header->version = version;
     FREE_BINARY(version_binary);
     INIT_BINARY(flags_binary);
     if (!read_bufreader(reader, &flags_binary, 1)) {
-        printf("Failed to read flags\n");
+        DEBUG_MSG("Failed to read flags");
         return false;
     }
     new_header->is_encrypted = (flags_binary.data[0] & ENCRYPTED_FLAG);
@@ -150,7 +150,7 @@ bool deser_br_fheader(bufreader_t *reader, fheader_t *new_header) {
     FREE_BINARY(flags_binary);
     INIT_BINARY(file_count_binary);
     if (!read_bufreader(reader, &file_count_binary, 1)) {
-        printf("Failed to read file count\n");
+        DEBUG_MSG("Failed to read file count");
         return false;
     }
     uint64_t file_count = 0;
@@ -158,7 +158,7 @@ bool deser_br_fheader(bufreader_t *reader, fheader_t *new_header) {
     FREE_BINARY(file_count_binary);
     INIT_BINARY(file_count_bytes_binary);
     if (!read_bufreader(reader, &file_count_bytes_binary, file_count_bytes)) {
-        printf("Failed to read file count bytes\n");
+        DEBUG_MSG("Failed to read file count bytes");
         return false;
     }
     for (int i = 0; i < file_count_bytes; i++) {
