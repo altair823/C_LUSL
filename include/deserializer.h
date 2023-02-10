@@ -62,6 +62,12 @@ x.input_file_reader = NULL; \
  */
 bool deserialize(deserializer_t *deserializer);
 
+/**
+ * @brief Read the header of a file.
+ * @param header Header to read.
+ * @param input_file_reader Reader to read from.
+ * @return True if successful, false otherwise.
+ */
 bool read_header(fheader_t *header, bufreader_t *input_file_reader);
 
 #endif // DESERIALIZER_H

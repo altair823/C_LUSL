@@ -9,7 +9,7 @@
 #include <assert.h>
 #include "config.h"
 
-typedef uint8_t byte_t;
+typedef uint8_t byte_t; ///< Byte type.
 
 /**
  * @brief The binary struct

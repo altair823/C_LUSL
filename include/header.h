@@ -21,10 +21,9 @@
 */
 bool ser_flabel(binary_t *binary);
 
-/// Offset for version in file header.
-#define VERSION_START_OFFSET 0x01
-#define ENCRYPTED_FLAG 0x80
-#define COMPRESSED_FLAG 0x40
+#define VERSION_START_OFFSET 0x01 ///< Offset of version in file header.
+#define ENCRYPTED_FLAG 0x80 ///< Flag whether file is encrypted.
+#define COMPRESSED_FLAG 0x40 ///< Flag whether file is compressed.
 
 /**
  * @brief The Version struct
@@ -38,12 +37,14 @@ typedef struct {
     unsigned char patch;
 } version_t;
 
-///< Create version struct from current major, minor, and patch versions of program.
-#define CURRENT_VERSION(version) version_t version = {MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION}
 
-///< Create empty version struct.
-#define EMPTY_VERSION(version) version_t version = {0, 0, 0}
+#define CURRENT_VERSION(version) version_t version = {MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION} ///< Create version struct from current major, minor, and patch versions of program.
 
+#define EMPTY_VERSION(version) version_t version = {0, 0, 0} ///< Create empty version struct.
+
+/**
+ * @brief The result of comparing two version structs.
+*/
 enum v_cmp_result {
     VERSION_COMPATIBLE = 1, ///< The version of the file is compatible but maybe older than the current version of the program.
     VERSION_INCOMPATIBLE = 0 ///< The version of the file is not compatible.

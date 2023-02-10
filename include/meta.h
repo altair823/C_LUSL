@@ -59,9 +59,9 @@
 
 #define FILL_NULL_HASH(x) for (int i = 0; i < HASH_SIZE; i++) { x[i] = NULL_HASH; } ///< Fill hash with null hash value.
 
-#define IS_DIR 0x80
-#define IS_FILE 0x40
-#define IS_LINK 0x20
+#define IS_DIR 0x80 ///< Flag whether target is directory.
+#define IS_FILE 0x40 ///< Flag whether target is file.
+#define IS_LINK 0x20 ///< Flag whether target is link.
 
 /**
  * @brief The metadata struct
